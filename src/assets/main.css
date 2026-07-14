@@ -182,33 +182,107 @@ h3 {
   gap: 10px;
 }
 
-.health-badge {
-  display: inline-flex;
+.weather-badge {
+  display: grid;
+  grid-template-columns: 36px minmax(78px, auto);
+  min-width: 132px;
+  height: 48px;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
+  padding-left: 15px;
+  border-left: 1px solid var(--line);
+}
+
+.weather-emoji {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  font-family: "Segoe UI Emoji", "Apple Color Emoji", sans-serif;
+  font-size: 25px;
+  line-height: 1;
+  transform-origin: center;
+  animation: weather-float 3.2s ease-in-out infinite;
+}
+
+.weather-copy {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.weather-copy strong {
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+
+.weather-copy small {
+  overflow: hidden;
   color: var(--muted);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.health-badge i {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #aab4ae;
+.weather-badge.is-error .weather-copy strong {
+  color: var(--muted);
+  font-size: 11px;
 }
 
-.health-badge.ok i {
-  background: #13a56f;
-  box-shadow: 0 0 0 4px rgba(19, 165, 111, 0.12);
+.weather-badge.is-error .weather-emoji {
+  filter: grayscale(0.35);
+  opacity: 0.72;
 }
 
-.health-badge.error {
-  color: var(--danger);
+.weather-loading {
+  animation: weather-loading 1s ease-in-out infinite alternate;
 }
 
-.health-badge.error i {
-  background: var(--danger);
+.weather-sunny .weather-emoji {
+  animation: weather-sun 8s linear infinite;
+}
+
+.weather-rain .weather-emoji,
+.weather-shower .weather-emoji,
+.weather-sleet .weather-emoji {
+  animation: weather-rain 1.5s ease-in-out infinite;
+}
+
+.weather-snow .weather-emoji {
+  animation: weather-snow 3.4s ease-in-out infinite;
+}
+
+@keyframes weather-float {
+  0%,
+  100% { transform: translateY(1px); }
+  50% { transform: translateY(-3px); }
+}
+
+@keyframes weather-sun {
+  from { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.08); }
+  to { transform: rotate(360deg) scale(1); }
+}
+
+@keyframes weather-rain {
+  0%,
+  100% { transform: translateY(-2px); }
+  55% { transform: translateY(3px); }
+}
+
+@keyframes weather-snow {
+  0%,
+  100% { transform: translateY(-2px) rotate(-7deg); }
+  50% { transform: translateY(3px) rotate(7deg); }
+}
+
+@keyframes weather-loading {
+  from { opacity: 0.35; }
+  to { opacity: 1; }
 }
 
 .icon-button {
@@ -1560,9 +1634,20 @@ h3 {
     left: 10px;
   }
 
-  .brand-copy,
-  .health-badge {
+  .brand-copy {
     display: none;
+  }
+
+  .weather-badge {
+    grid-template-columns: 32px minmax(70px, auto);
+    min-width: 112px;
+    gap: 6px;
+    padding-left: 10px;
+  }
+
+  .weather-emoji {
+    width: 32px;
+    font-size: 23px;
   }
 
   .home-map-layout {
@@ -1624,6 +1709,12 @@ h3 {
 
   .mobile-menu-button {
     display: grid;
+  }
+
+  .weather-badge {
+    height: 44px;
+    padding-left: 0;
+    border-left: 0;
   }
 
   .mobile-nav {

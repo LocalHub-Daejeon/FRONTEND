@@ -1,12 +1,11 @@
 <script setup>
-import { computed, onMounted, ref } from "vue";
+import { ref } from "vue";
 import { RouterLink, RouterView, useRoute } from "vue-router";
 import { Bot, Compass, HeartHandshake, Map, Menu, X } from "@lucide/vue";
-import { healthApi } from "./services/api";
+import WeatherBadge from "./components/common/WeatherBadge.vue";
 
 const route = useRoute();
 const menuOpen = ref(false);
-const health = ref("checking");
 
 const navItems = [
   { label: "둘러보기", to: "/", icon: Compass },
@@ -15,25 +14,10 @@ const navItems = [
   { label: "AI 여행메이트", to: "/chat", icon: Bot },
 ];
 
-const healthLabel = computed(() => {
-  if (health.value === "ok") return "API 연결됨";
-  if (health.value === "error") return "API 연결 필요";
-  return "API 확인 중";
-});
-
 function isActive(path) {
   if (path === "/") return route.path === "/";
   return route.path.startsWith(path);
 }
-
-onMounted(async () => {
-  try {
-    const data = await healthApi.check();
-    health.value = data.status === "ok" ? "ok" : "error";
-  } catch {
-    health.value = "error";
-  }
-});
 </script>
 
 <template>
@@ -58,9 +42,7 @@ onMounted(async () => {
         </nav>
 
         <div class="header-actions">
-          <span class="health-badge" :class="health">
-            <i aria-hidden="true"></i>{{ healthLabel }}
-          </span>
+          <WeatherBadge />
           <button
             class="icon-button mobile-menu-button"
             type="button"
