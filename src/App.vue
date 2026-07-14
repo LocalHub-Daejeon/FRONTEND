@@ -1,0 +1,99 @@
+<script setup>
+import { computed, onMounted, ref } from "vue";
+import { RouterLink, RouterView, useRoute } from "vue-router";
+import { Bot, Compass, HeartHandshake, Map, Menu, X } from "@lucide/vue";
+import { healthApi } from "./services/api";
+
+const route = useRoute();
+const menuOpen = ref(false);
+const health = ref("checking");
+
+const navItems = [
+  { label: "둘러보기", to: "/", icon: Compass },
+  { label: "여행 지도", to: "/tours", icon: Map },
+  { label: "커뮤니티", to: "/community", icon: HeartHandshake },
+  { label: "AI 여행메이트", to: "/chat", icon: Bot },
+];
+
+const healthLabel = computed(() => {
+  if (health.value === "ok") return "API 연결됨";
+  if (health.value === "error") return "API 연결 필요";
+  return "API 확인 중";
+});
+
+function isActive(path) {
+  if (path === "/") return route.path === "/";
+  return route.path.startsWith(path);
+}
+
+onMounted(async () => {
+  try {
+    const data = await healthApi.check();
+    health.value = data.status === "ok" ? "ok" : "error";
+  } catch {
+    health.value = "error";
+  }
+});
+</script>
+
+<template>
+  <div class="app-frame">
+    <header class="app-header">
+      <div class="header-inner">
+        <RouterLink class="brand" to="/" aria-label="두루 홈">
+          <span class="brand-mark">두루</span>
+          <span class="brand-copy">대전·충청 여행 커뮤니티</span>
+        </RouterLink>
+
+        <nav class="desktop-nav" aria-label="주요 메뉴">
+          <RouterLink
+            v-for="item in navItems"
+            :key="item.to"
+            :to="item.to"
+            :class="{ active: isActive(item.to) }"
+          >
+            <component :is="item.icon" :size="17" />
+            {{ item.label }}
+          </RouterLink>
+        </nav>
+
+        <div class="header-actions">
+          <span class="health-badge" :class="health">
+            <i aria-hidden="true"></i>{{ healthLabel }}
+          </span>
+          <button
+            class="icon-button mobile-menu-button"
+            type="button"
+            :title="menuOpen ? '메뉴 닫기' : '메뉴 열기'"
+            @click="menuOpen = !menuOpen"
+          >
+            <X v-if="menuOpen" :size="21" />
+            <Menu v-else :size="21" />
+          </button>
+        </div>
+      </div>
+      <nav v-if="menuOpen" class="mobile-nav" aria-label="모바일 메뉴">
+        <RouterLink
+          v-for="item in navItems"
+          :key="item.to"
+          :to="item.to"
+          :class="{ active: isActive(item.to) }"
+          @click="menuOpen = false"
+        >
+          <component :is="item.icon" :size="18" />
+          {{ item.label }}
+        </RouterLink>
+      </nav>
+    </header>
+
+    <main><RouterView /></main>
+
+    <footer class="app-footer">
+      <div>
+        <strong>두루</strong>
+        <span>대전·충청의 장소와 경험을 잇습니다.</span>
+      </div>
+      <span>Tour Community Project</span>
+    </footer>
+  </div>
+</template>
