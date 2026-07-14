@@ -34,8 +34,8 @@ async function request(path, options = {}) {
   return data;
 }
 
-export const healthApi = {
-  check: () => request("/health"),
+export const weatherApi = {
+  getCurrent: () => request("/weather"),
 };
 
 export const toursApi = {
