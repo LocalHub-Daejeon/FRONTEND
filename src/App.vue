@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from "vue";
 import { RouterLink, RouterView, useRoute } from "vue-router";
-import { Bot, Compass, HeartHandshake, Map, Menu, X } from "@lucide/vue";
+import { Bot, CalendarDays, Compass, HeartHandshake, Map, Menu, X } from "@lucide/vue";
 import WeatherBadge from "./components/common/WeatherBadge.vue";
 
 const route = useRoute();
@@ -10,6 +10,7 @@ const menuOpen = ref(false);
 const navItems = [
   { label: "둘러보기", to: "/", icon: Compass },
   { label: "여행 지도", to: "/tours", icon: Map },
+  { label: "축제 캘린더", to: "/festivals", icon: CalendarDays },
   { label: "커뮤니티", to: "/community", icon: HeartHandshake },
   { label: "AI 여행메이트", to: "/chat", icon: Bot },
 ];
