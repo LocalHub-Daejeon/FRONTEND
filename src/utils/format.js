@@ -1,8 +1,11 @@
+import i18n from "../i18n";
+
 export function formatDate(value, withTime = false) {
   if (!value) return "";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
-  return new Intl.DateTimeFormat("ko-KR", {
+  const intlLocale = i18n.global.locale.value === "en" ? "en-US" : "ko-KR";
+  return new Intl.DateTimeFormat(intlLocale, {
     year: "numeric",
     month: "short",
     day: "numeric",

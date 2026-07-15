@@ -1,6 +1,7 @@
 <script setup>
 import { computed, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { useI18n } from "vue-i18n";
 import { Layers3, ListFilter, MapPin, Search, Sparkles } from "@lucide/vue";
 import AppPagination from "../components/common/AppPagination.vue";
 import StatePanel from "../components/common/StatePanel.vue";
@@ -14,6 +15,7 @@ import {
 } from "../data/travelCourseMeta";
 import { useToursStore } from "../stores/tours";
 
+const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const store = useToursStore();
@@ -25,16 +27,35 @@ const selectedTheme = ref("");
 const randomCourseGroups = ref([]);
 const activeGroupId = ref("");
 
-const typeOptions = [
-  { value: "", label: "전체" },
-  { value: "12", label: "관광지" },
-  { value: "14", label: "문화시설" },
-  { value: "15", label: "축제·행사" },
-  { value: "28", label: "레포츠" },
-  { value: "32", label: "숙박" },
-  { value: "38", label: "쇼핑" },
-  { value: "39", label: "음식점" },
-];
+const typeOptionValues = ["", "12", "14", "15", "28", "32", "38", "39"];
+const typeOptions = computed(() =>
+  typeOptionValues.map((value) => ({
+    value,
+    label: t(`tours.types.${value || "all"}`),
+  })),
+);
+
+function areaLabel(value) {
+  return t(`tours.areas.${value || "all"}`);
+}
+
+function themeLabel(value) {
+  return t(`tours.themes.${value || "all"}`);
+}
+
+function groupTitle(group) {
+  let themeKeyword = t("tours.themes.defaultKeyword");
+  if (group.themeCodes.includes("C0114")) themeKeyword = t("tours.themes.healingKeyword");
+  else if (group.themeCodes.includes("C0112")) themeKeyword = t("tours.themes.familyKeyword");
+  else if (group.themeCodes.includes("C0116")) themeKeyword = t("tours.themes.campingKeyword");
+  else if (group.themeCodes.includes("C0115")) themeKeyword = t("tours.themes.walkingKeyword");
+
+  const areaPrefix = group.areaCodes.length === 1
+    ? `${areaLabel(group.areaCodes[0])} `
+    : `${t("tours.areas.regionDefault")} `;
+
+  return `${group.emoji} ${areaPrefix}${themeKeyword} ${t("tours.courseSuffix")}`;
+}
 
 const isCourseMode = computed(() => String(store.contentTypeId) === "25");
 const isFestivalMode = computed(() => String(store.contentTypeId) === "15");
@@ -74,31 +95,20 @@ function generateRandomGroups(items) {
     const chunk = shuffled.slice(index, index + chunkSize);
 
     if (chunk.length >= 2) {
-      const themes = [...new Set(chunk.map(item => item.themeName).filter(Boolean))];
-      const areas = [...new Set(chunk.map(item => item.areaName).filter(Boolean))];
-      
+      const themeCodes = [...new Set(chunk.map(item => item.themeCode).filter(Boolean))];
+      const areaCodes = [...new Set(chunk.map(item => item.areaCode).filter(Boolean))];
+
       let emoji = "📍";
-      let themeKeyword = "다채로운 매력의";
-      
-      if (themes.includes("힐링")) {
-        emoji = "🌿"; 
-        themeKeyword = "여유로운 힐링";
-      } else if (themes.includes("가족")) {
-        emoji = "👨‍👩‍👧‍👦"; 
-        themeKeyword = "가족과 함께하는";
-      } else if (themes.includes("캠핑")) {
-        emoji = "🏕️"; 
-        themeKeyword = "자연 속 캠핑";
-      } else if (themes.includes("도보")) {
-        emoji = "👟"; 
-        themeKeyword = "뚜벅이 도보 여행";
-      }
-      
-      const areaPrefix = areas.length === 1 ? `${areas[0]} ` : "대전·충청 ";
+      if (themeCodes.includes("C0114")) emoji = "🌿";
+      else if (themeCodes.includes("C0112")) emoji = "👨‍👩‍👧‍👦";
+      else if (themeCodes.includes("C0116")) emoji = "🏕️";
+      else if (themeCodes.includes("C0115")) emoji = "👟";
 
       groups.push({
         id: `random-group-${count}`,
-        title: `${emoji} ${areaPrefix}${themeKeyword} 코스`,
+        emoji,
+        themeCodes,
+        areaCodes,
         items: chunk
       });
       count++;
@@ -178,7 +188,7 @@ watch(displayedItems, (newItems) => {
 
 onMounted(() => {
   const queryType = String(route.query.type || "");
-  if (typeOptions.some((option) => option.value === queryType) || queryType === "25") {
+  if (typeOptionValues.includes(queryType) || queryType === "25") {
     store.contentTypeId = queryType;
   }
   fetchTours({ keyword: keywordInput.value, page: 1 }).then(() => {
@@ -195,21 +205,17 @@ onMounted(() => {
       <div class="hero-content">
         <div class="hero-text">
           <p class="eyebrow hero-eyebrow">
-            <MapPin :size="14" /> {{ isFestivalMode ? "FESTIVAL CALENDAR" : "TRAVEL MAP" }}
+            <MapPin :size="14" /> {{ isFestivalMode ? t("tours.festival.eyebrow") : t("tours.map.eyebrow") }}
           </p>
-          <h1>{{ isFestivalMode ? "축제 캘린더" : "여행 지도" }}</h1>
+          <h1>{{ isFestivalMode ? t("tours.festival.title") : t("tours.map.title") }}</h1>
           <p>
-            {{
-              isFestivalMode
-                ? "대전·충청의 축제 일정을 권역별로 확인해보세요."
-                : "대전·충청의 장소를 사진과 지도 위에서 함께 살펴보세요."
-            }}
+            {{ isFestivalMode ? t("tours.festival.description") : t("tours.map.description") }}
           </p>
         </div>
         <div class="hero-stats">
           <div class="stat-badge">
-            총 <strong class="result-count">{{ resultTotal.toLocaleString() }}</strong>
-            <small>{{ isFestivalMode ? "개의 축제" : isCourseMode ? "개의 코스" : "곳의 여행지" }}</small>
+            {{ t("tours.totalPrefix") }} <strong class="result-count">{{ resultTotal.toLocaleString() }}</strong>
+            <small>{{ isFestivalMode ? t("tours.festival.unit") : isCourseMode ? t("tours.map.unitCourse") : t("tours.map.unitPlace") }}</small>
           </div>
         </div>
       </div>
@@ -223,16 +229,16 @@ onMounted(() => {
           <input
             v-model="keywordInput"
             type="search"
-            :placeholder="isFestivalMode ? '축제명이나 주소를 검색하세요' : '장소명이나 주소를 검색하세요'"
-            :aria-label="isFestivalMode ? '축제 검색' : '관광지 검색'"
+            :placeholder="isFestivalMode ? t('tours.festival.searchPlaceholder') : t('tours.map.searchPlaceholder')"
+            :aria-label="isFestivalMode ? t('tours.festival.searchAriaLabel') : t('tours.map.searchAriaLabel')"
           />
         </div>
-        <button class="search-btn" type="submit">검색</button>
+        <button class="search-btn" type="submit">{{ t("tours.search") }}</button>
       </form>
     </div>
 
     <!-- 모던 스타일 카테고리 필터 -->
-    <div class="type-filter modern-type-filter fade-in-up" style="animation-delay: 0.15s;" aria-label="관광지 유형">
+    <div class="type-filter modern-type-filter fade-in-up" style="animation-delay: 0.15s;" :aria-label="t('tours.typeFilterLabel')">
       <ListFilter :size="18" class="filter-icon" aria-hidden="true" />
       <div class="filter-scroll-area">
         <button
@@ -251,23 +257,23 @@ onMounted(() => {
           :class="{ active: store.contentTypeId === '25' }"
           @click="changeType('25')"
         >
-          <Sparkles :size="16" /> 추천 여행코스
+          <Sparkles :size="16" /> {{ t("tours.recommendedCourse") }}
         </button>
       </div>
     </div>
 
     <!-- 모던 코스 필터 패널 -->
-    <section v-if="isCourseMode" class="course-filter-panel modern-panel fade-in-up" style="animation-delay: 0.2s;" aria-label="여행코스 필터">
+    <section v-if="isCourseMode" class="course-filter-panel modern-panel fade-in-up" style="animation-delay: 0.2s;" :aria-label="t('tours.courseFilter.label')">
       <div class="course-filter-intro">
         <div class="icon-wrap"><Layers3 :size="20" aria-hidden="true" /></div>
         <div>
-          <strong>지역과 테마로 코스 찾기</strong>
-          <p>각 마커는 코스의 대표 위치이며, 같은 위치의 코스는 숫자로 묶어 표시합니다.</p>
+          <strong>{{ t("tours.courseFilter.heading") }}</strong>
+          <p>{{ t("tours.courseFilter.description") }}</p>
         </div>
       </div>
       <div class="filter-groups-wrap">
         <div class="course-filter-group">
-          <span class="group-label">지역</span>
+          <span class="group-label">{{ t("tours.courseFilter.areaLabel") }}</span>
           <div class="course-filter-options">
             <button
               v-for="option in courseAreaOptions"
@@ -277,12 +283,12 @@ onMounted(() => {
               :class="{ active: selectedArea === option.value }"
               @click="changeArea(option.value)"
             >
-              {{ option.label }} <small>{{ optionCount("area", option.value) }}</small>
+              {{ areaLabel(option.value) }} <small>{{ optionCount("area", option.value) }}</small>
             </button>
           </div>
         </div>
         <div class="course-filter-group">
-          <span class="group-label">테마</span>
+          <span class="group-label">{{ t("tours.courseFilter.themeLabel") }}</span>
           <div class="course-filter-options">
             <button
               v-for="option in courseThemeOptions"
@@ -293,7 +299,7 @@ onMounted(() => {
               :disabled="optionCount('theme', option.value) === 0"
               @click="changeTheme(option.value)"
             >
-              {{ option.label }} <small>{{ optionCount("theme", option.value) }}</small>
+              {{ themeLabel(option.value) }} <small>{{ optionCount("theme", option.value) }}</small>
             </button>
           </div>
         </div>
@@ -306,9 +312,9 @@ onMounted(() => {
       style="animation-delay: 0.25s;"
       aria-live="polite"
     >
-      <StatePanel v-if="store.loading" type="loading" title="축제 일정을 불러오는 중이에요" />
-      <StatePanel v-else-if="store.error" type="error" title="축제 일정을 불러오지 못했어요" :description="store.error" />
-      <StatePanel v-else-if="!store.items.length" title="등록된 축제가 없어요" description="검색어를 바꿔보세요." />
+      <StatePanel v-if="store.loading" type="loading" :title="t('tours.loading.festival')" />
+      <StatePanel v-else-if="store.error" type="error" :title="t('tours.error.festival')" :description="store.error" />
+      <StatePanel v-else-if="!store.items.length" :title="t('tours.empty.festivalTitle')" :description="t('tours.empty.festivalDescription')" />
       <FestivalCalendar v-else :festivals="store.items" />
     </section>
 
@@ -325,22 +331,22 @@ onMounted(() => {
       </aside>
 
       <section class="tour-results" aria-live="polite">
-        <StatePanel v-if="store.loading" type="loading" title="여행지를 불러오는 중이에요" />
-        <StatePanel v-else-if="store.error" type="error" title="여행지를 불러오지 못했어요" :description="store.error" />
-        
+        <StatePanel v-if="store.loading" type="loading" :title="t('tours.loading.places')" />
+        <StatePanel v-else-if="store.error" type="error" :title="t('tours.error.places')" :description="store.error" />
+
         <template v-else>
           <div v-if="isCourseMode" class="random-courses-container">
             <p v-if="missingLocationCount" class="course-location-notice modern-notice">
-              위치 정보가 없는 {{ missingLocationCount }}개 코스는 제외되었습니다.
+              {{ t("tours.missingLocationNotice", { count: missingLocationCount }) }}
             </p>
-            <div 
-              v-for="group in randomCourseGroups" 
-              :key="group.id" 
+            <div
+              v-for="group in randomCourseGroups"
+              :key="group.id"
               class="course-route-wrap modern-route-wrap"
               :class="{ 'active-group': activeGroupId === group.id }"
               @click="activeGroupId = group.id"
             >
-              <h2 class="group-title">{{ group.title }}</h2>
+              <h2 class="group-title">{{ groupTitle(group) }}</h2>
               <ol class="route-timeline">
                 <li v-for="(tour, index) in group.items" :key="tour.contentid" class="route-step">
                   <div class="step-marker">
@@ -350,7 +356,7 @@ onMounted(() => {
                   <RouterLink :to="`/tours/${tour.contentid}`" class="step-content">
                     <h3 class="step-title">{{ tour.title }}</h3>
                     <p class="step-desc">
-                      <MapPin :size="14" class="tiny-pin" /> {{ tour.addr1 || tour.addr2 || '주소 정보 없음' }}
+                      <MapPin :size="14" class="tiny-pin" /> {{ tour.addr1 || tour.addr2 || t("tours.addressUnknown") }}
                     </p>
                   </RouterLink>
                 </li>
