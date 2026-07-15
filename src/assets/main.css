@@ -879,6 +879,7 @@ h3 {
   display: grid;
   grid-template-columns: 24px minmax(0, 1fr);
   align-items: center;
+  min-width: 0;
   min-height: 48px;
   padding: 0 13px;
   border: 1px solid var(--line);
@@ -934,6 +935,94 @@ h3 {
   color: #fff;
 }
 
+.course-filter-panel {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.9fr) minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 18px;
+  margin: -8px 0 24px;
+  padding: 16px 18px;
+  border: 1px solid #cbd9d4;
+  border-radius: 8px;
+  background: #f2f7f5;
+}
+
+.course-filter-intro {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  align-items: start;
+  gap: 9px;
+  color: var(--brand-dark);
+}
+
+.course-filter-intro > div {
+  min-width: 0;
+}
+
+.course-filter-intro strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--ink);
+  font-size: 14px;
+}
+
+.course-filter-intro p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.course-filter-group {
+  display: grid;
+  gap: 7px;
+}
+
+.course-filter-group > span {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.course-filter-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.course-filter-options button {
+  min-height: 32px;
+  padding: 0 10px;
+  border: 1px solid #c3d2cc;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink-soft);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.course-filter-options button small {
+  margin-left: 3px;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.course-filter-options button.active {
+  border-color: var(--brand);
+  background: var(--brand);
+  color: #fff;
+}
+
+.course-filter-options button.active small {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.course-filter-options button:disabled {
+  cursor: not-allowed;
+  opacity: 0.38;
+}
+
 .explore-layout {
   display: grid;
   grid-template-columns: minmax(390px, 0.82fr) minmax(0, 1.18fr);
@@ -973,6 +1062,62 @@ h3 {
   font-weight: 750;
 }
 
+.course-marker-icon-wrap {
+  border: 0;
+  background: transparent;
+}
+
+.course-marker-icon {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  background: var(--brand);
+  box-shadow: 0 5px 14px rgba(21, 45, 42, 0.3);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.course-marker-icon.active {
+  border-width: 4px;
+  border-color: #fff;
+  background: #d65337;
+  box-shadow: 0 0 0 3px #a33a24, 0 5px 14px rgba(21, 45, 42, 0.3);
+}
+
+.course-marker-popup {
+  display: grid;
+  gap: 6px;
+  padding: 3px;
+}
+
+.course-marker-popup > strong {
+  margin-bottom: 2px;
+  color: var(--ink);
+  font-size: 12px;
+}
+
+.course-marker-popup button {
+  padding: 7px 8px;
+  border: 0;
+  border-radius: 5px;
+  background: var(--surface-alt);
+  color: var(--ink-soft);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.4;
+  text-align: left;
+}
+
+.course-marker-popup button:hover {
+  background: #dfebe7;
+  color: var(--brand-dark);
+}
+
 .map-result-bar {
   position: absolute;
   z-index: 500;
@@ -1010,6 +1155,15 @@ h3 {
 
 .tour-results .tour-card {
   grid-template-rows: 176px minmax(104px, auto);
+}
+
+.course-location-notice {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: #fff6e7;
+  color: #79531e;
+  font-size: 12px;
 }
 
 .pagination {
@@ -1793,6 +1947,14 @@ h3 {
     grid-template-columns: 1fr;
   }
 
+  .course-filter-panel {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .course-filter-intro {
+    grid-column: 1 / -1;
+  }
+
   .map-column {
     position: relative;
     top: auto;
@@ -1825,6 +1987,14 @@ h3 {
 }
 
 @media (max-width: 560px) {
+  .course-filter-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .course-filter-intro {
+    grid-column: auto;
+  }
+
   .page-width,
   .header-inner,
   .app-footer {
