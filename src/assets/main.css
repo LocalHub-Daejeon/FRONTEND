@@ -1121,8 +1121,8 @@ h3 {
 .map-result-bar {
   position: absolute;
   z-index: 500;
+  top: 12px;
   right: 12px;
-  bottom: 12px;
   left: 12px;
   display: grid;
   grid-template-columns: 24px minmax(0, 1fr);
