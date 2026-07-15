@@ -11,6 +11,7 @@ export default defineConfig({
         target: "https://backend-33kp.onrender.com",
         changeOrigin: true,
         secure: true,
+        ws: true,
       },
     },
   },

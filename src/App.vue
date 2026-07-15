@@ -1,11 +1,19 @@
 <script setup>
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { RouterLink, RouterView, useRoute } from "vue-router";
 import { Bot, CalendarDays, Compass, HeartHandshake, Map, Menu, X } from "@lucide/vue";
 import WeatherBadge from "./components/common/WeatherBadge.vue";
+import ViewerCountBadge from "./components/common/ViewerCountBadge.vue";
+import NewPostBanner from "./components/common/NewPostBanner.vue";
+import { useRealtimeStore } from "./stores/realtime";
 
 const route = useRoute();
 const menuOpen = ref(false);
+const realtime = useRealtimeStore();
+
+onMounted(() => {
+  realtime.init();
+});
 
 const navItems = [
   { label: "둘러보기", to: "/", icon: Compass },
@@ -44,6 +52,7 @@ function isActive(path) {
 
         <div class="header-actions">
           <WeatherBadge />
+          <ViewerCountBadge />
           <button
             class="icon-button mobile-menu-button"
             type="button"
@@ -68,6 +77,8 @@ function isActive(path) {
         </RouterLink>
       </nav>
     </header>
+
+    <NewPostBanner />
 
     <main><RouterView /></main>
 
