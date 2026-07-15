@@ -1,7 +1,7 @@
 <script setup>
 import { computed, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { Layers3, ListFilter, MapPin, Search } from "@lucide/vue";
+import { Layers3, ListFilter, MapPin, Search, Sparkles } from "@lucide/vue";
 import AppPagination from "../components/common/AppPagination.vue";
 import StatePanel from "../components/common/StatePanel.vue";
 import TourCard from "../components/tours/TourCard.vue";
@@ -21,12 +21,14 @@ const selectedId = ref("");
 const selectedArea = ref("");
 const selectedTheme = ref("");
 
+const randomCourseGroups = ref([]);
+const activeGroupId = ref("");
+
 const typeOptions = [
   { value: "", label: "전체" },
   { value: "12", label: "관광지" },
   { value: "14", label: "문화시설" },
   { value: "15", label: "축제·행사" },
-  { value: "25", label: "여행코스" },
   { value: "28", label: "레포츠" },
   { value: "32", label: "숙박" },
   { value: "38", label: "쇼핑" },
@@ -46,13 +48,46 @@ const displayedItems = computed(() => {
 const displayedMappableItems = computed(() =>
   displayedItems.value.filter((item) => Number(item.mapx) && Number(item.mapy)),
 );
-const selectedTour = computed(() =>
-  displayedItems.value.find((tour) => String(tour.contentid) === String(selectedId.value)),
-);
 const resultTotal = computed(() => (isCourseMode.value ? displayedItems.value.length : store.total));
 const missingLocationCount = computed(
   () => displayedItems.value.length - displayedMappableItems.value.length,
 );
+
+// 👇 타이틀을 전문적으로 수정했습니다.
+function generateRandomGroups(items) {
+  if (!isCourseMode.value) {
+    randomCourseGroups.value = [];
+    return;
+  }
+
+  const validItems = items.filter(item => Number(item.mapx) && Number(item.mapy));
+  const shuffled = [...validItems].sort(() => 0.5 - Math.random());
+
+  const groups = [];
+  let index = 0;
+  let count = 1;
+
+  while (index < shuffled.length) {
+    const chunkSize = Math.floor(Math.random() * 2) + 3;
+    const chunk = shuffled.slice(index, index + chunkSize);
+
+    if (chunk.length >= 2) {
+      // String.fromCharCode(64 + count) 를 통해 1, 2, 3 대신 A, B, C 문자를 부여합니다.
+      groups.push({
+        id: `random-group-${count}`,
+        title: `📍 효율적 동선 최적화 코스 ${String.fromCharCode(64 + count)}`,
+        items: chunk
+      });
+      count++;
+    }
+    index += chunkSize;
+  }
+
+  randomCourseGroups.value = groups;
+  if (groups.length > 0) {
+    activeGroupId.value = groups[0].id;
+  }
+}
 
 function optionCount(type, value) {
   if (!isCourseMode.value) return 0;
@@ -70,15 +105,8 @@ function optionCount(type, value) {
   ).length;
 }
 
-function syncSelectedTour() {
-  if (!displayedItems.value.some((tour) => String(tour.contentid) === String(selectedId.value))) {
-    selectedId.value = displayedMappableItems.value[0]?.contentid || displayedItems.value[0]?.contentid || "";
-  }
-}
-
 async function fetchTours(overrides = {}) {
   await store.fetchTours({ size: isCourseMode.value ? 100 : 12, ...overrides });
-  syncSelectedTour();
 }
 
 function submitSearch() {
@@ -110,12 +138,10 @@ function changeArea(value) {
   if (selectedTheme.value && !optionCount("theme", selectedTheme.value)) {
     selectedTheme.value = "";
   }
-  syncSelectedTour();
 }
 
 function changeTheme(value) {
   selectedTheme.value = value;
-  syncSelectedTour();
 }
 
 function changePage(page) {
@@ -123,13 +149,18 @@ function changePage(page) {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-watch(displayedItems, syncSelectedTour);
+watch(displayedItems, (newItems) => {
+  generateRandomGroups(newItems);
+});
+
 onMounted(() => {
   const queryType = String(route.query.type || "");
-  if (typeOptions.some((option) => option.value === queryType)) {
+  if (typeOptions.some((option) => option.value === queryType) || queryType === "25") {
     store.contentTypeId = queryType;
   }
-  fetchTours({ keyword: keywordInput.value, page: 1 });
+  fetchTours({ keyword: keywordInput.value, page: 1 }).then(() => {
+    generateRandomGroups(displayedItems.value);
+  });
 });
 </script>
 
@@ -163,6 +194,16 @@ onMounted(() => {
         :class="{ active: store.contentTypeId === option.value }"
         @click="changeType(option.value)"
       >{{ option.label }}</button>
+
+      <div class="filter-divider"></div>
+
+      <button
+        class="special-course-btn"
+        :class="{ active: store.contentTypeId === '25' }"
+        @click="changeType('25')"
+      >
+        <Sparkles :size="16" /> 추천 여행코스
+      </button>
     </div>
 
     <section v-if="isCourseMode" class="course-filter-panel" aria-label="여행코스 필터">
@@ -207,42 +248,57 @@ onMounted(() => {
     <div class="explore-layout">
       <aside class="map-column">
         <TourMap
-          :tours="displayedMappableItems"
+          :tours="isCourseMode ? (randomCourseGroups.find(g => g.id === activeGroupId)?.items || []) : displayedMappableItems"
           :active-id="selectedId"
-          :group-overlaps="isCourseMode"
+          :draw-path="isCourseMode"
           @select="selectedId = $event.contentid"
         />
-        <RouterLink v-if="selectedTour" class="map-result-bar" :to="`/tours/${selectedTour.contentid}`">
-          <MapPin :size="18" />
-          <span>
-            <strong>{{ selectedTour.title }}</strong>
-            <small v-if="isCourseMode">{{ selectedTour.areaName }} · {{ selectedTour.themeName }} 코스</small>
-            <small v-else>{{ selectedTour.addr1 }}</small>
-          </span>
-        </RouterLink>
       </aside>
 
       <section class="tour-results" aria-live="polite">
         <StatePanel v-if="store.loading" type="loading" title="여행지를 불러오는 중이에요" />
         <StatePanel v-else-if="store.error" type="error" title="여행지를 불러오지 못했어요" :description="store.error" />
-        <StatePanel
-          v-else-if="!displayedItems.length"
-          :title="isCourseMode ? '조건에 맞는 여행코스가 없어요' : '조건에 맞는 여행지가 없어요'"
-          description="검색어나 필터를 바꿔보세요."
-        />
+        
         <template v-else>
-          <p v-if="isCourseMode && missingLocationCount" class="course-location-notice">
-            위치 정보가 없는 {{ missingLocationCount }}개 코스는 목록에서만 확인할 수 있습니다.
-          </p>
-          <div class="tour-grid">
+          <div v-if="isCourseMode" class="random-courses-container">
+            <p v-if="missingLocationCount" class="course-location-notice">
+              위치 정보가 없는 {{ missingLocationCount }}개 코스는 제외되었습니다.
+            </p>
+            <div 
+              v-for="group in randomCourseGroups" 
+              :key="group.id" 
+              class="course-route-wrap"
+              :class="{ 'active-group': activeGroupId === group.id }"
+              @click="activeGroupId = group.id"
+            >
+              <h2 class="group-title">{{ group.title }}</h2>
+              <ol class="route-timeline">
+                <li v-for="(tour, index) in group.items" :key="tour.contentid" class="route-step">
+                  <div class="step-marker">
+                    <span class="marker-dot"></span>
+                    <div v-if="index !== group.items.length - 1" class="marker-line"></div>
+                  </div>
+                  <RouterLink :to="`/tours/${tour.contentid}`" class="step-content">
+                    <h3 class="step-title">{{ tour.title }}</h3>
+                    <p class="step-desc">
+                      <MapPin :size="14" /> {{ tour.addr1 || tour.addr2 || '주소 정보 없음' }}
+                    </p>
+                  </RouterLink>
+                </li>
+              </ol>
+            </div>
+          </div>
+          
+          <div v-else class="tour-grid">
             <TourCard
               v-for="tour in displayedItems"
               :key="tour.contentid"
               :tour="tour"
-              :region-label="isCourseMode ? tour.areaName : ''"
-              :theme-label="isCourseMode ? tour.themeName : ''"
+              :region-label="tour.areaName || ''"
+              :theme-label="tour.themeName || ''"
             />
           </div>
+
           <AppPagination
             v-if="!isCourseMode"
             :page="store.page"
@@ -254,3 +310,146 @@ onMounted(() => {
     </div>
   </div>
 </template>
+
+<style scoped>
+.filter-divider {
+  width: 1px;
+  height: 20px;
+  background-color: var(--line);
+  margin: 0 4px;
+  flex-shrink: 0;
+}
+
+.special-course-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+  min-height: 38px;
+  padding: 0 16px;
+  border: 1px solid var(--coral);
+  border-radius: 6px;
+  background: #fff8f6;
+  color: var(--coral-dark);
+  font-size: 13px;
+  font-weight: 800;
+  transition: all 0.2s ease;
+}
+
+.special-course-btn:hover {
+  background: #fceae6;
+}
+
+.special-course-btn.active {
+  background: var(--coral);
+  border-color: var(--coral);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(214, 83, 55, 0.25);
+}
+
+.random-courses-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.course-route-wrap {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 24px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.course-route-wrap:hover {
+  border-color: #9dafaa;
+}
+
+.course-route-wrap.active-group {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px rgba(8, 127, 120, 0.12);
+}
+
+.group-title {
+  font-size: 1.3rem;
+  font-weight: 800;
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: var(--brand-dark);
+}
+
+.route-timeline {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.route-step {
+  display: flex;
+  gap: 1.2rem;
+}
+
+.step-marker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 20px;
+}
+
+.marker-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background-color: var(--brand);
+  border: 3px solid var(--surface);
+  box-shadow: 0 0 0 2px var(--brand);
+  z-index: 1;
+}
+
+.marker-line {
+  flex: 1;
+  width: 2px;
+  background-color: var(--line);
+  margin-top: 4px;
+  margin-bottom: 4px;
+  min-height: 40px;
+}
+
+.step-content {
+  padding-bottom: 1.5rem;
+  display: block;
+}
+
+.step-content:hover .step-title {
+  color: var(--brand);
+}
+
+.step-title {
+  font-size: 1.05rem;
+  font-weight: 750;
+  margin: 0 0 0.3rem 0;
+  color: var(--ink);
+  transition: color 0.2s;
+}
+
+.step-desc {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin: 0;
+}
+
+.course-location-notice {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: #fff6e7;
+  color: #79531e;
+  font-size: 12px;
+}
+</style>
