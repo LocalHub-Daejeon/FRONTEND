@@ -21,44 +21,382 @@ onMounted(() => store.fetchTour(route.params.contentId).catch(() => {}));
 
 <template>
   <div class="page-width page-view detail-view">
-    <RouterLink class="back-link" to="/tours"><ArrowLeft :size="18" /> 여행 지도로 돌아가기</RouterLink>
+    <RouterLink class="back-link modern-back fade-in-up" to="/tours">
+      <div class="back-icon-wrap"><ArrowLeft :size="18" stroke-width="2.5" /></div>
+      <span>여행 지도로 돌아가기</span>
+    </RouterLink>
+    
     <StatePanel v-if="store.detailLoading" type="loading" title="장소 정보를 불러오는 중이에요" />
     <StatePanel v-else-if="store.error" type="error" title="장소 정보를 찾지 못했어요" :description="store.error" />
 
     <template v-else-if="tour">
-      <section class="tour-detail-hero">
-        <img :src="tour.firstimage || tour.firstimage2 || fallbackImage" :alt="`${tour.title} 전경`" @error="onImageError" />
-        <div class="tour-detail-overlay">
-          <span class="category-chip">{{ tour.contentType || "관광지" }}</span>
-          <h1>{{ tour.title }}</h1>
-          <p><MapPin :size="18" /> {{ [tour.addr1, tour.addr2].filter(Boolean).join(" ") }}</p>
+      <section class="tour-detail-hero modern-hero fade-in-up" style="animation-delay: 0.1s;">
+        <img class="hero-bg" :src="tour.firstimage || tour.firstimage2 || fallbackImage" :alt="`${tour.title} 전경`" @error="onImageError" />
+        <div class="hero-overlay">
+          <span class="category-chip glass-chip">{{ tour.contentType || "관광지" }}</span>
+          <h1 class="hero-title">{{ tour.title }}</h1>
+          <p class="hero-address"><MapPin :size="18" /> {{ [tour.addr1, tour.addr2].filter(Boolean).join(" ") }}</p>
         </div>
       </section>
 
-      <div class="detail-content-grid">
+      <div class="detail-content-grid modern-grid fade-in-up" style="animation-delay: 0.2s;">
         <section class="place-info">
           <div class="section-heading">
-            <div><p class="section-kicker">PLACE INFO</p><h2>방문 정보</h2></div>
+            <div>
+              <p class="section-kicker brand-kicker">PLACE INFO</p>
+              <h2>방문 정보</h2>
+            </div>
           </div>
-          <dl class="info-list">
-            <div><dt><MapPin :size="18" /> 주소</dt><dd>{{ [tour.addr1, tour.addr2].filter(Boolean).join(" ") || "정보 없음" }}</dd></div>
-            <div><dt><Phone :size="18" /> 문의</dt><dd>{{ tour.tel || "정보 없음" }}</dd></div>
-            <div><dt><Route :size="18" /> 우편번호</dt><dd>{{ tour.zipcode || "정보 없음" }}</dd></div>
+          
+          <dl class="info-list modern-info-list">
+            <div class="info-row">
+              <dt>
+                <div class="icon-bubble"><MapPin :size="18" /></div> 주소
+              </dt>
+              <dd>{{ [tour.addr1, tour.addr2].filter(Boolean).join(" ") || "정보 없음" }}</dd>
+            </div>
+            <div class="info-row">
+              <dt>
+                <div class="icon-bubble"><Phone :size="18" /></div> 문의
+              </dt>
+              <dd>{{ tour.tel || "정보 없음" }}</dd>
+            </div>
+            <div class="info-row">
+              <dt>
+                <div class="icon-bubble"><Route :size="18" /></div> 우편번호
+              </dt>
+              <dd>{{ tour.zipcode || "정보 없음" }}</dd>
+            </div>
           </dl>
-          <RouterLink class="community-prompt" to="/community">
-            <Sparkles :size="20" />
-            <span><strong>이곳에 다녀오셨나요?</strong><small>나만의 팁과 여행 경험을 커뮤니티에 남겨주세요.</small></span>
+          
+          <RouterLink class="community-prompt modern-prompt" to="/community">
+            <div class="prompt-icon-wrap"><Sparkles :size="24" class="sparkle-icon" /></div>
+            <div class="prompt-text">
+              <strong>이곳에 다녀오셨나요?</strong>
+              <small>나만의 팁과 여행 경험을 커뮤니티에 남겨주세요.</small>
+            </div>
+            <ExternalLink :size="18" class="prompt-arrow" />
           </RouterLink>
         </section>
 
         <aside class="detail-map-panel">
-          <TourMap v-if="hasCoordinates" :tours="[tour]" :active-id="tour.contentid" single />
-          <StatePanel v-else title="등록된 위치 정보가 없어요" />
-          <a v-if="directionsUrl" class="secondary-button full-button" :href="directionsUrl" target="_blank" rel="noreferrer">
-            길찾기 <ExternalLink :size="16" />
+          <div class="map-container">
+            <TourMap v-if="hasCoordinates" :tours="[tour]" :active-id="tour.contentid" single />
+            <StatePanel v-else title="등록된 위치 정보가 없어요" />
+          </div>
+          <a v-if="directionsUrl" class="route-button" :href="directionsUrl" target="_blank" rel="noreferrer">
+            <MapPin :size="18" /> Google 지도에서 길찾기 <ExternalLink :size="16" class="ext-icon" />
           </a>
         </aside>
       </div>
     </template>
   </div>
 </template>
+
+<style scoped>
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in-up {
+  opacity: 0;
+  animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.modern-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+  color: var(--ink-soft);
+  font-weight: 800;
+  transition: color 0.2s ease;
+  text-decoration: none;
+}
+
+.back-icon-wrap {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--surface-alt);
+  transition: all 0.3s ease;
+}
+
+.modern-back:hover .back-icon-wrap {
+  background: var(--brand);
+  color: #fff;
+  transform: translateX(-4px);
+}
+
+.modern-back:hover span {
+  color: var(--brand-dark);
+}
+
+.modern-hero {
+  position: relative;
+  height: 480px;
+  border-radius: 24px;
+  overflow: hidden;
+  margin-bottom: 48px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0,0,0,0.05);
+  background: var(--surface-alt);
+}
+
+.hero-bg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 10s ease-out;
+}
+
+.modern-hero:hover .hero-bg {
+  transform: scale(1.05);
+}
+
+/* 👇 경계선 없이 자연스럽게 끝에서만 짙어지도록 완만하게 수정 */
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 55%, rgba(0,0,0,0.2) 75%, rgba(0,0,0,0.85) 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 48px;
+  color: #ffffff;
+}
+
+/* 👇 카테고리 칩도 반투명 화이트 톤으로 밝게 변경하여 답답함을 없앰 */
+.glass-chip {
+  align-self: flex-start;
+  padding: 6px 16px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 800;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* 👇 텍스트 배경이 밝아질 수 있으니 글씨가 잘 보이도록 부드러운 그림자 추가 */
+.hero-title {
+  font-size: 42px;
+  font-weight: 900;
+  margin: 0 0 12px 0;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+
+.hero-address {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.95);
+  margin: 0;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
+}
+
+.modern-grid {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 48px;
+  align-items: start;
+}
+
+.brand-kicker {
+  color: var(--brand);
+  background: rgba(8, 127, 120, 0.1);
+  padding: 6px 12px;
+  border-radius: 20px;
+  display: inline-block;
+  margin-bottom: 16px;
+  font-weight: 800;
+}
+
+.modern-info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 40px;
+}
+
+.info-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 24px;
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+}
+
+.info-row dt {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--muted);
+}
+
+.icon-bubble {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  background: var(--surface-alt);
+  border-radius: 8px;
+  color: var(--brand);
+}
+
+.info-row dd {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.5;
+}
+
+.modern-prompt {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 28px;
+  background: linear-gradient(135deg, #fff0ed 0%, #ffe6e0 100%);
+  border-radius: 20px;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid rgba(214, 83, 55, 0.1);
+  box-shadow: 0 8px 24px rgba(214, 83, 55, 0.05);
+}
+
+.modern-prompt:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(214, 83, 55, 0.15);
+}
+
+.prompt-icon-wrap {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  background: var(--coral);
+  color: #ffffff;
+  border-radius: 14px;
+  flex-shrink: 0;
+  box-shadow: 0 6px 16px rgba(214, 83, 55, 0.2);
+}
+
+.sparkle-icon {
+  animation: pulse 2s infinite alternate;
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.9); }
+  100% { transform: scale(1.1); }
+}
+
+.prompt-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.prompt-text strong {
+  font-size: 17px;
+  color: var(--coral-dark);
+}
+
+.prompt-text small {
+  font-size: 13.5px;
+  color: #9c4c3b;
+}
+
+.prompt-arrow {
+  color: var(--coral);
+  transition: transform 0.3s ease;
+}
+
+.modern-prompt:hover .prompt-arrow {
+  transform: translate(2px, -2px);
+}
+
+.detail-map-panel {
+  position: sticky;
+  top: 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.map-container {
+  height: 380px;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.05);
+  background: var(--surface);
+}
+
+.route-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 56px;
+  background: var(--ink);
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 750;
+  border-radius: 16px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.route-button:hover {
+  background: #000000;
+  transform: translateY(-3px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+}
+
+.route-button:active {
+  transform: translateY(1px);
+}
+
+.ext-icon {
+  opacity: 0.8;
+}
+
+@media (max-width: 992px) {
+  .modern-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  
+  .modern-hero {
+    height: 400px;
+    padding: 32px;
+  }
+  
+  .hero-title {
+    font-size: 32px;
+  }
+  
+  .detail-map-panel {
+    position: static;
+  }
+}
+</style>
