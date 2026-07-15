@@ -53,7 +53,7 @@ const missingLocationCount = computed(
   () => displayedItems.value.length - displayedMappableItems.value.length,
 );
 
-// 👇 타이틀을 전문적으로 수정했습니다.
+// 무작위로 3~4개씩 데이터를 묶고 포함된 데이터 특성에 따라 제목을 자동 생성하는 함수
 function generateRandomGroups(items) {
   if (!isCourseMode.value) {
     randomCourseGroups.value = [];
@@ -72,10 +72,35 @@ function generateRandomGroups(items) {
     const chunk = shuffled.slice(index, index + chunkSize);
 
     if (chunk.length >= 2) {
-      // String.fromCharCode(64 + count) 를 통해 1, 2, 3 대신 A, B, C 문자를 부여합니다.
+      // 1. 그룹 내 코스들의 테마와 지역 데이터 수집
+      const themes = [...new Set(chunk.map(item => item.themeName).filter(Boolean))];
+      const areas = [...new Set(chunk.map(item => item.areaName).filter(Boolean))];
+      
+      // 2. 테마에 따른 키워드 및 이모지 동적 할당
+      let emoji = "📍";
+      let themeKeyword = "다채로운 매력의";
+      
+      if (themes.includes("힐링")) {
+        emoji = "🌿"; 
+        themeKeyword = "여유로운 힐링";
+      } else if (themes.includes("가족")) {
+        emoji = "👨‍👩‍👧‍👦"; 
+        themeKeyword = "가족과 함께하는";
+      } else if (themes.includes("캠핑")) {
+        emoji = "🏕️"; 
+        themeKeyword = "자연 속 캠핑";
+      } else if (themes.includes("도보")) {
+        emoji = "👟"; 
+        themeKeyword = "뚜벅이 도보 여행";
+      }
+      
+      // 3. 지역 이름 설정 (모두 같은 지역이면 해당 지역명, 아니면 대전·충청)
+      const areaPrefix = areas.length === 1 ? `${areas[0]} ` : "대전·충청 ";
+
       groups.push({
         id: `random-group-${count}`,
-        title: `📍 효율적 동선 최적화 코스 ${String.fromCharCode(64 + count)}`,
+        // 👇 A, B, C 알파벳을 빼고 깔끔하게 출력
+        title: `${emoji} ${areaPrefix}${themeKeyword} 코스`,
         items: chunk
       });
       count++;
