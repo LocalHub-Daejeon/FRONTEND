@@ -53,7 +53,6 @@ const missingLocationCount = computed(
   () => displayedItems.value.length - displayedMappableItems.value.length,
 );
 
-// 무작위로 3~4개씩 데이터를 묶고 포함된 데이터 특성에 따라 제목을 자동 생성하는 함수
 function generateRandomGroups(items) {
   if (!isCourseMode.value) {
     randomCourseGroups.value = [];
@@ -372,6 +371,7 @@ onMounted(() => {
   overflow: hidden;
   border-radius: 20px;
   background: linear-gradient(135deg, #eaf4f1 0%, #d8eae5 100%);
+  margin-top: 60px; /* 👈 이 부분을 추가하여 위쪽 섹션과의 간격을 확보하세요. */
   margin-bottom: 32px;
   border: 1px solid rgba(255, 255, 255, 0.8);
   box-shadow: 0 10px 30px rgba(8, 127, 120, 0.05);
@@ -384,6 +384,7 @@ onMounted(() => {
   background: radial-gradient(circle at 90% 10%, rgba(8, 127, 120, 0.08) 0%, transparent 40%);
 }
 
+/* 👇 배너 안쪽 상하 여백을 56px에서 72px로 늘려 답답함을 해소했습니다. */
 .hero-content {
   position: relative;
   display: flex;
@@ -391,14 +392,16 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 56px 32px;
+  padding: 72px 32px; 
   z-index: 1;
 }
 
+/* 👇 텍스트 덩어리와 하단 뱃지 사이의 간격을 28px에서 40px로 넉넉하게 띄웠습니다. */
 .hero-text {
-  margin-bottom: 28px;
+  margin-bottom: 40px; 
 }
 
+/* 👇 태그와 제목 사이의 간격을 20px에서 24px로 조정했습니다. */
 .hero-eyebrow {
   display: inline-flex;
   align-items: center;
@@ -409,14 +412,16 @@ onMounted(() => {
   border-radius: 20px;
   font-weight: 800;
   letter-spacing: 0.5px;
-  margin-bottom: 20px;
+  margin-bottom: 48px; /* 👈 이 값을 기존 24px에서 48px 등으로 늘려주세요. */
 }
 
+/* 👇 제목과 설명 사이의 간격을 12px에서 16px로 띄웠습니다. */
 .hero-text h1 {
   font-size: 38px;
   font-weight: 900;
   color: var(--ink);
-  margin-bottom: 12px;
+  margin-top: 24px; /* 👈 이 속성을 새롭게 추가해 보세요. */
+  margin-bottom: 16px; 
   letter-spacing: -0.5px;
 }
 

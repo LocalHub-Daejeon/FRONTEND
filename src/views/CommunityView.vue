@@ -169,6 +169,7 @@ onMounted(() => store.fetchPosts({ page: 1, keyword: "" }));
   font-size: 38px;
   font-weight: 900;
   color: var(--ink);
+  margin-top: 24px; /* 👈 이 속성을 새롭게 추가하여 간격을 띄워주세요. */
   margin-bottom: 12px;
   letter-spacing: -0.5px;
 }

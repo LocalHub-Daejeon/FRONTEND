@@ -30,7 +30,8 @@ onMounted(() => store.fetchTour(route.params.contentId).catch(() => {}));
     <StatePanel v-else-if="store.error" type="error" title="장소 정보를 찾지 못했어요" :description="store.error" />
 
     <template v-else-if="tour">
-      <section class="tour-detail-hero modern-hero fade-in-up" style="animation-delay: 0.1s;">
+      <!-- 👇 tour-detail-hero 클래스를 제거하여 main.css의 강제 덮개를 완벽히 차단했습니다 -->
+      <section class="modern-hero fade-in-up" style="animation-delay: 0.1s;">
         <img class="hero-bg" :src="tour.firstimage || tour.firstimage2 || fallbackImage" :alt="`${tour.title} 전경`" @error="onImageError" />
         <div class="hero-overlay">
           <span class="category-chip glass-chip">{{ tour.contentType || "관광지" }}</span>
@@ -157,11 +158,9 @@ onMounted(() => store.fetchTour(route.params.contentId).catch(() => {}));
   transform: scale(1.05);
 }
 
-/* 👇 경계선 없이 자연스럽게 끝에서만 짙어지도록 완만하게 수정 */
 .hero-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 55%, rgba(0,0,0,0.2) 75%, rgba(0,0,0,0.85) 100%);
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -169,7 +168,6 @@ onMounted(() => store.fetchTour(route.params.contentId).catch(() => {}));
   color: #ffffff;
 }
 
-/* 👇 카테고리 칩도 반투명 화이트 톤으로 밝게 변경하여 답답함을 없앰 */
 .glass-chip {
   align-self: flex-start;
   padding: 6px 16px;
@@ -185,14 +183,14 @@ onMounted(() => store.fetchTour(route.params.contentId).catch(() => {}));
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
-/* 👇 텍스트 배경이 밝아질 수 있으니 글씨가 잘 보이도록 부드러운 그림자 추가 */
 .hero-title {
   font-size: 42px;
   font-weight: 900;
   margin: 0 0 12px 0;
   letter-spacing: -0.5px;
   line-height: 1.2;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+  /* 덮개가 사라졌으므로 밝은 배경에서도 잘 보이게 그림자를 강하게 유지 */
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.8), 0 0 6px rgba(0, 0, 0, 0.6);
 }
 
 .hero-address {
@@ -202,7 +200,7 @@ onMounted(() => store.fetchTour(route.params.contentId).catch(() => {}));
   font-size: 16px;
   color: rgba(255, 255, 255, 0.95);
   margin: 0;
-  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.8), 0 0 6px rgba(0, 0, 0, 0.6);
 }
 
 .modern-grid {
@@ -272,17 +270,17 @@ onMounted(() => store.fetchTour(route.params.contentId).catch(() => {}));
   align-items: center;
   gap: 20px;
   padding: 28px;
-  background: linear-gradient(135deg, #fff0ed 0%, #ffe6e0 100%);
+  background: linear-gradient(135deg, #f0f7f4 0%, #eaf4f1 100%);
   border-radius: 20px;
   text-decoration: none;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  border: 1px solid rgba(214, 83, 55, 0.1);
-  box-shadow: 0 8px 24px rgba(214, 83, 55, 0.05);
+  border: 1px solid rgba(8, 127, 120, 0.1);
+  box-shadow: 0 8px 24px rgba(8, 127, 120, 0.05);
 }
 
 .modern-prompt:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 32px rgba(214, 83, 55, 0.15);
+  box-shadow: 0 12px 32px rgba(8, 127, 120, 0.15);
 }
 
 .prompt-icon-wrap {
@@ -290,11 +288,11 @@ onMounted(() => store.fetchTour(route.params.contentId).catch(() => {}));
   place-items: center;
   width: 48px;
   height: 48px;
-  background: var(--coral);
+  background: var(--brand);
   color: #ffffff;
   border-radius: 14px;
   flex-shrink: 0;
-  box-shadow: 0 6px 16px rgba(214, 83, 55, 0.2);
+  box-shadow: 0 6px 16px rgba(8, 127, 120, 0.2);
 }
 
 .sparkle-icon {
@@ -315,16 +313,16 @@ onMounted(() => store.fetchTour(route.params.contentId).catch(() => {}));
 
 .prompt-text strong {
   font-size: 17px;
-  color: var(--coral-dark);
+  color: var(--brand-dark);
 }
 
 .prompt-text small {
   font-size: 13.5px;
-  color: #9c4c3b;
+  color: var(--brand);
 }
 
 .prompt-arrow {
-  color: var(--coral);
+  color: var(--brand);
   transition: transform 0.3s ease;
 }
 

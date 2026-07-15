@@ -197,6 +197,7 @@ async function sendMessage(message = input.value) {
   font-size: 38px;
   font-weight: 900;
   color: #ffffff;
+  margin-top: 24px; /* 👈 이 부분을 새롭게 추가하여 간격을 확보하세요. */
   margin-bottom: 16px; /* 큰 제목과 설명 사이의 여백 */
   letter-spacing: -0.5px;
 }
