@@ -11,9 +11,9 @@ const route = useRoute();
 const store = useToursStore();
 const tour = computed(() => store.selected);
 const hasCoordinates = computed(() => Number(tour.value?.mapx) && Number(tour.value?.mapy));
-const directionsUrl = computed(() => {
-  if (!hasCoordinates.value) return "";
-  return `https://www.google.com/maps/dir/?api=1&destination=${tour.value.mapy},${tour.value.mapx}`;
+const naverMapUrl = computed(() => {
+  const query = tour.value?.title?.trim();
+  return query ? `https://map.naver.com/p/search/${encodeURIComponent(query)}` : "";
 });
 
 onMounted(() => store.fetchTour(route.params.contentId).catch(() => {}));
@@ -85,8 +85,8 @@ onMounted(() => store.fetchTour(route.params.contentId).catch(() => {}));
             <TourMap v-if="hasCoordinates" :tours="[tour]" :active-id="tour.contentid" single />
             <StatePanel v-else title="등록된 위치 정보가 없어요" />
           </div>
-          <a v-if="directionsUrl" class="route-button" :href="directionsUrl" target="_blank" rel="noreferrer">
-            <MapPin :size="18" /> Google 지도에서 길찾기 <ExternalLink :size="16" class="ext-icon" />
+          <a v-if="naverMapUrl" class="route-button" :href="naverMapUrl" target="_blank" rel="noopener noreferrer">
+            <MapPin :size="18" /> 네이버 지도에서 보기 <ExternalLink :size="16" class="ext-icon" />
           </a>
         </aside>
       </div>
