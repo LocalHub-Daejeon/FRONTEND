@@ -4,6 +4,7 @@ import { useRoute, useRouter } from "vue-router";
 import { Layers3, ListFilter, MapPin, Search, Sparkles } from "@lucide/vue";
 import AppPagination from "../components/common/AppPagination.vue";
 import StatePanel from "../components/common/StatePanel.vue";
+import FestivalCalendar from "../components/tours/FestivalCalendar.vue";
 import TourCard from "../components/tours/TourCard.vue";
 import TourMap from "../components/tours/TourMap.vue";
 import {
@@ -36,6 +37,8 @@ const typeOptions = [
 ];
 
 const isCourseMode = computed(() => String(store.contentTypeId) === "25");
+const isFestivalMode = computed(() => String(store.contentTypeId) === "15");
+const usesFullDataset = computed(() => isCourseMode.value || isFestivalMode.value);
 const enrichedCourses = computed(() => store.items.map(enrichTravelCourse));
 const displayedItems = computed(() => {
   if (!isCourseMode.value) return store.items;
@@ -126,7 +129,7 @@ function optionCount(type, value) {
 }
 
 async function fetchTours(overrides = {}) {
-  await store.fetchTours({ size: isCourseMode.value ? 100 : 12, ...overrides });
+  await store.fetchTours({ size: usesFullDataset.value ? 100 : 12, ...overrides });
 }
 
 function submitSearch() {
@@ -150,7 +153,7 @@ function changeType(value) {
   selectedArea.value = "";
   selectedTheme.value = "";
   selectedId.value = "";
-  fetchTours({ page: 1, size: value === "25" ? 100 : 12 });
+  fetchTours({ page: 1, size: value === "25" || value === "15" ? 100 : 12 });
 }
 
 function changeArea(value) {
@@ -191,13 +194,22 @@ onMounted(() => {
       <div class="hero-bg-shapes"></div>
       <div class="hero-content">
         <div class="hero-text">
-          <p class="eyebrow hero-eyebrow"><MapPin :size="14" /> TRAVEL MAP</p>
-          <h1>여행 지도</h1>
-          <p>대전·충청의 장소를 사진과 지도 위에서 함께 살펴보세요.</p>
+          <p class="eyebrow hero-eyebrow">
+            <MapPin :size="14" /> {{ isFestivalMode ? "FESTIVAL CALENDAR" : "TRAVEL MAP" }}
+          </p>
+          <h1>{{ isFestivalMode ? "축제 캘린더" : "여행 지도" }}</h1>
+          <p>
+            {{
+              isFestivalMode
+                ? "대전·충청의 축제 일정을 권역별로 확인해보세요."
+                : "대전·충청의 장소를 사진과 지도 위에서 함께 살펴보세요."
+            }}
+          </p>
         </div>
         <div class="hero-stats">
           <div class="stat-badge">
-            총 <strong class="result-count">{{ resultTotal.toLocaleString() }}</strong> <small>{{ isCourseMode ? "개의 코스" : "곳의 여행지" }}</small>
+            총 <strong class="result-count">{{ resultTotal.toLocaleString() }}</strong>
+            <small>{{ isFestivalMode ? "개의 축제" : isCourseMode ? "개의 코스" : "곳의 여행지" }}</small>
           </div>
         </div>
       </div>
@@ -208,7 +220,12 @@ onMounted(() => {
       <form class="glass-search-toolbar" role="search" @submit.prevent="submitSearch">
         <div class="search-input-wrap interactive-input">
           <Search :size="19" class="search-icon" />
-          <input v-model="keywordInput" type="search" placeholder="장소명이나 주소를 검색하세요" aria-label="관광지 검색" />
+          <input
+            v-model="keywordInput"
+            type="search"
+            :placeholder="isFestivalMode ? '축제명이나 주소를 검색하세요' : '장소명이나 주소를 검색하세요'"
+            :aria-label="isFestivalMode ? '축제 검색' : '관광지 검색'"
+          />
         </div>
         <button class="search-btn" type="submit">검색</button>
       </form>
@@ -283,7 +300,19 @@ onMounted(() => {
       </div>
     </section>
 
-    <div class="explore-layout fade-in-up" style="animation-delay: 0.25s;">
+    <section
+      v-if="isFestivalMode"
+      class="festival-view fade-in-up"
+      style="animation-delay: 0.25s;"
+      aria-live="polite"
+    >
+      <StatePanel v-if="store.loading" type="loading" title="축제 일정을 불러오는 중이에요" />
+      <StatePanel v-else-if="store.error" type="error" title="축제 일정을 불러오지 못했어요" :description="store.error" />
+      <StatePanel v-else-if="!store.items.length" title="등록된 축제가 없어요" description="검색어를 바꿔보세요." />
+      <FestivalCalendar v-else :festivals="store.items" />
+    </section>
+
+    <div v-else class="explore-layout fade-in-up" style="animation-delay: 0.25s;">
       <aside class="map-column">
         <div class="map-wrapper-modern">
           <TourMap
