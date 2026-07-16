@@ -27,18 +27,10 @@ onMounted(() => store.fetchTour(route.params.contentId).catch(() => {}));
 
 <template>
   <div class="page-width page-view detail-view">
-    <div class="detail-top-bar fade-in-up">
-      <RouterLink class="back-link modern-back" to="/tours">
-        <div class="back-icon-wrap"><ArrowLeft :size="18" stroke-width="2.5" /></div>
-        <span>{{ t("tourDetail.backToMap") }}</span>
-      </RouterLink>
-      <ShareButtons
-        v-if="tour"
-        :title="tour.title"
-        :description="shareDescription"
-        :image-url="tour.firstimage || tour.firstimage2 || fallbackImage"
-      />
-    </div>
+    <RouterLink class="back-link modern-back fade-in-up" to="/tours">
+      <div class="back-icon-wrap"><ArrowLeft :size="18" stroke-width="2.5" /></div>
+      <span>{{ t("tourDetail.backToMap") }}</span>
+    </RouterLink>
 
     <StatePanel v-if="store.detailLoading" type="loading" :title="t('tourDetail.loading')" />
     <StatePanel v-else-if="store.error" type="error" :title="t('tourDetail.error')" :description="store.error" />
@@ -102,6 +94,13 @@ onMounted(() => store.fetchTour(route.params.contentId).catch(() => {}));
           <a v-if="directionsUrl" class="route-button" :href="directionsUrl" target="_blank" rel="noreferrer">
             <MapPin :size="18" /> {{ t("tourDetail.directions") }} <ExternalLink :size="16" class="ext-icon" />
           </a>
+          <ShareButtons
+            v-if="tour"
+            class="detail-share"
+            :title="tour.title"
+            :description="shareDescription"
+            :image-url="tour.firstimage || tour.firstimage2 || fallbackImage"
+          />
         </aside>
       </div>
     </template>
@@ -119,20 +118,11 @@ onMounted(() => store.fetchTour(route.params.contentId).catch(() => {}));
   animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.detail-top-bar {
-  position: relative;
-  z-index: 5;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 24px;
-}
-
 .modern-back {
   display: inline-flex;
   align-items: center;
   gap: 10px;
+  margin-bottom: 24px;
   color: var(--ink-soft);
   font-weight: 800;
   transition: color 0.2s ease;
@@ -401,27 +391,43 @@ onMounted(() => store.fetchTour(route.params.contentId).catch(() => {}));
   opacity: 0.8;
 }
 
+.detail-share {
+  width: 100%;
+}
+
+.detail-share :deep(.share-trigger) {
+  width: 100%;
+  height: 56px;
+  justify-content: center;
+  border-radius: 16px;
+  font-size: 15px;
+}
+
+.detail-share :deep(.share-dropdown) {
+  right: 0;
+  left: 0;
+  width: 100%;
+  bottom: calc(100% + 8px);
+  top: auto;
+}
+
 @media (max-width: 992px) {
   .modern-grid {
     grid-template-columns: 1fr;
     gap: 32px;
   }
-  
+
   .modern-hero {
     height: 400px;
     padding: 32px;
   }
-  
+
   .hero-title {
     font-size: 32px;
   }
-  
+
   .detail-map-panel {
     position: static;
-  }
-
-  .detail-top-bar {
-    flex-wrap: wrap;
   }
 }
 </style>
