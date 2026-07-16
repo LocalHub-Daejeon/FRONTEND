@@ -2,14 +2,14 @@
 import { computed, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
-import { ArrowLeft, ExternalLink, MapPin, Phone, Route, Sparkles } from "@lucide/vue";
+import { ArrowLeft, CalendarDays, ExternalLink, MapPin, Phone, Route, Sparkles } from "@lucide/vue";
 import ShareButtons from "../components/common/ShareButtons.vue";
 import StatePanel from "../components/common/StatePanel.vue";
 import TourMap from "../components/tours/TourMap.vue";
 import { useToursStore } from "../stores/tours";
-import { fallbackImage, onImageError } from "../utils/format";
+import { fallbackImage, formatEventDate, onImageError } from "../utils/format";
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const route = useRoute();
 const store = useToursStore();
 const tour = computed(() => store.selected);
@@ -20,6 +20,12 @@ const naverMapUrl = computed(() => {
 });
 const shareDescription = computed(() =>
   [tour.value?.addr1, tour.value?.addr2].filter(Boolean).join(" "),
+);
+const festivalStartDate = computed(() =>
+  formatEventDate(tour.value?.eventstartdate, locale.value),
+);
+const festivalEndDate = computed(() =>
+  formatEventDate(tour.value?.eventenddate, locale.value),
 );
 
 onMounted(() => store.fetchTour(route.params.contentId).catch(() => {}));
@@ -73,6 +79,21 @@ onMounted(() => store.fetchTour(route.params.contentId).catch(() => {}));
                 <div class="icon-bubble"><Route :size="18" /></div> {{ t("tourDetail.zipcode") }}
               </dt>
               <dd>{{ tour.zipcode || t("tourDetail.noInfo") }}</dd>
+            </div>
+            <div class="info-row festival-info-row">
+              <dt>
+                <div class="icon-bubble"><CalendarDays :size="18" /></div> {{ t("tourDetail.festivalSchedule") }}
+              </dt>
+              <dd class="festival-date-details">
+                <span>
+                  <small>{{ t("tourDetail.festivalStartDate") }}</small>
+                  <strong>{{ festivalStartDate || t("tourDetail.noInfo") }}</strong>
+                </span>
+                <span>
+                  <small>{{ t("tourDetail.festivalEndDate") }}</small>
+                  <strong>{{ festivalEndDate || t("tourDetail.noInfo") }}</strong>
+                </span>
+              </dd>
             </div>
           </dl>
 
@@ -276,6 +297,34 @@ onMounted(() => store.fetchTour(route.params.contentId).catch(() => {}));
   font-weight: 600;
   color: var(--ink);
   line-height: 1.5;
+}
+
+.festival-info-row {
+  border-color: rgba(8, 127, 120, 0.2);
+  background: #f1f7f5;
+}
+
+.festival-date-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 28px;
+}
+
+.festival-date-details span {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.festival-date-details small {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.festival-date-details strong {
+  color: var(--brand-dark);
+  font-size: 16px;
 }
 
 .modern-prompt {
