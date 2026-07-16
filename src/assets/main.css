@@ -484,6 +484,122 @@ h3 {
   color: var(--brand-dark);
 }
 
+.share-menu {
+  position: relative;
+}
+
+.share-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink-soft);
+  font-size: 13px;
+  font-weight: 750;
+  transition: all 0.2s ease;
+}
+
+.share-trigger:hover {
+  border-color: #c9d4cf;
+  background: var(--surface-alt);
+  color: var(--ink);
+}
+
+.share-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 1200;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 200px;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.share-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ink-soft);
+  font-size: 13.5px;
+  font-weight: 700;
+  text-align: left;
+  transition: background 0.15s ease;
+}
+
+.share-option:hover {
+  background: var(--surface-alt);
+  color: var(--ink);
+}
+
+.share-icon-badge {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: 9px;
+  background: var(--surface-alt);
+  color: var(--ink-soft);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.kakao-badge {
+  background: #fee500;
+  color: #191600;
+}
+
+.message-badge {
+  background: #eaf0eb;
+  color: var(--ink-soft);
+}
+
+.facebook-badge {
+  background: #1877f2;
+  color: #ffffff;
+  font-style: italic;
+}
+
+.twitter-badge {
+  background: #0f1419;
+  color: #ffffff;
+}
+
+.instagram-badge {
+  background: linear-gradient(135deg, #feda75, #d62976 60%, #4f5bd5);
+  color: #ffffff;
+}
+
+.copy-badge {
+  background: var(--surface-alt);
+  color: var(--ink-soft);
+}
+
+.share-pop-enter-active,
+.share-pop-leave-active {
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.share-pop-enter-from,
+.share-pop-leave-to {
+  opacity: 0;
+  transform: translateY(-4px) scale(0.98);
+}
+
 .mobile-menu-button,
 .mobile-nav {
   display: none;
