@@ -270,7 +270,8 @@ onMounted(async () => {
 .advanced-gradient {
   background: linear-gradient(135deg, #1b2923 0%, #0d1a14 100%);
   position: relative;
-  overflow: hidden;
+  overflow: visible;
+  isolation: isolate;
   border: 1px solid #2a3c33;
 }
 
@@ -284,6 +285,13 @@ onMounted(async () => {
   background: radial-gradient(circle, rgba(230, 184, 92, 0.15) 0%, rgba(0,0,0,0) 70%);
   transform: translate(30%, -30%);
   pointer-events: none;
+  z-index: 0;
+}
+
+.advanced-gradient .ai-invite-content,
+.advanced-gradient .ai-btn {
+  position: relative;
+  z-index: 1;
 }
 
 .ai-icon.floating {

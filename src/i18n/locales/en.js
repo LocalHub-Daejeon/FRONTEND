@@ -224,13 +224,12 @@ export default {
     communityPromptDescription: "Share your own tips and travel experience with the community.",
     noLocation: "No location info registered",
     directions: "View in Naver Map",
-    festivalSchedule: "Festival schedule",
     festivalStartDate: "Starts",
     festivalEndDate: "Ends",
   },
   festivalPage: {
     title: "Festival Calendar",
-    description: "Browse Daejeon & Chungcheong festival schedules by month and region.",
+    description: "Browse Daejeon & Chungcheong festival schedules by month.",
     unit: "festivals",
     emptyDescription: "New festival schedules will appear here once registered.",
   },
@@ -274,9 +273,6 @@ export default {
     aiStart: "Start chatting",
   },
   festivalCalendar: {
-    eyebrow: "FESTIVAL CALENDAR",
-    heading: "Festival schedule by region",
-    description: "Check festivals with confirmed dates on the monthly calendar.",
     regionFilterAriaLabel: "Festival region filter",
     regions: {
       all: "All",
@@ -285,6 +281,13 @@ export default {
       "33": "Chungbuk",
       "34": "Chungnam",
       unclassified: "Other region",
+    },
+    regionShort: {
+      "3": "Daejeon",
+      "8": "Sejong",
+      "33": "Chungbuk",
+      "34": "Chungnam",
+      other: "Other",
     },
     scheduledCount: "{count} scheduled",
     unscheduledCount: "{count} unscheduled",
