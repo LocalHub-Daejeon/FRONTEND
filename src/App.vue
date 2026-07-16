@@ -5,6 +5,7 @@ import { Bot, CalendarDays, Compass, HeartHandshake, Map, Menu, X } from "@lucid
 import WeatherBadge from "./components/common/WeatherBadge.vue";
 import ViewerCountBadge from "./components/common/ViewerCountBadge.vue";
 import NewPostBanner from "./components/common/NewPostBanner.vue";
+import LikeToast from "./components/common/LikeToast.vue";
 import { useRealtimeStore } from "./stores/realtime";
 
 const route = useRoute();
@@ -79,6 +80,7 @@ function isActive(path) {
     </header>
 
     <NewPostBanner />
+    <LikeToast />
 
     <main><RouterView /></main>
 

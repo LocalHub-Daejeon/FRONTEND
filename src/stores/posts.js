@@ -1,5 +1,9 @@
 import { defineStore } from "pinia";
 import { postsApi } from "../services/api";
+import { loadAnonymousLikeState, saveAnonymousLikeState } from "../utils/anonymousLikes";
+
+const initialLikeState = loadAnonymousLikeState();
+let noticeTimer;
 
 export const usePostsStore = defineStore("posts", {
   state: () => ({
@@ -12,11 +16,24 @@ export const usePostsStore = defineStore("posts", {
     loading: false,
     detailLoading: false,
     error: "",
+    visitorId: initialLikeState.visitorId,
+    likedPostIds: initialLikeState.likedPostIds,
+    likingPostIds: [],
+    likeNotice: null,
   }),
   getters: {
     totalPages: (state) => Math.max(1, Math.ceil(state.total / state.size)),
+    isPostLiked: (state) => (postId) => state.likedPostIds.includes(String(postId)),
+    isPostLiking: (state) => (postId) => state.likingPostIds.includes(String(postId)),
   },
   actions: {
+    showLikeNotice(message, type = "info") {
+      window.clearTimeout(noticeTimer);
+      this.likeNotice = { message, type, id: Date.now() };
+      noticeTimer = window.setTimeout(() => {
+        this.likeNotice = null;
+      }, 2600);
+    },
     async fetchPosts(overrides = {}) {
       Object.assign(this, overrides);
       this.loading = true;
@@ -63,13 +80,34 @@ export const usePostsStore = defineStore("posts", {
       return postsApi.remove(postId, password);
     },
     async likePost(postId) {
-      const result = await postsApi.like(postId);
-      if (this.selected?.id === Number(postId)) {
-        this.selected.like_count = result.like_count;
+      const normalizedId = String(postId);
+      if (this.isPostLiked(normalizedId)) {
+        this.showLikeNotice("이미 좋아요를 누르셨어요.");
+        return { liked: true, duplicate: true };
       }
-      const listItem = this.items.find((item) => item.id === Number(postId));
-      if (listItem) listItem.like_count = result.like_count;
-      return result;
+
+      if (this.isPostLiking(normalizedId)) {
+        this.showLikeNotice("좋아요를 처리하고 있어요.");
+        return { liked: false, pending: true };
+      }
+
+      this.likingPostIds.push(normalizedId);
+      try {
+        const result = await postsApi.like(postId);
+        this.likedPostIds.push(normalizedId);
+        saveAnonymousLikeState(this.visitorId, this.likedPostIds);
+
+        if (this.selected?.id === Number(postId)) {
+          this.selected.like_count = result.like_count;
+        }
+        const listItem = this.items.find((item) => item.id === Number(postId));
+        if (listItem) listItem.like_count = result.like_count;
+
+        this.showLikeNotice("좋아요를 남겼어요.", "success");
+        return { ...result, liked: true, duplicate: false };
+      } finally {
+        this.likingPostIds = this.likingPostIds.filter((id) => id !== normalizedId);
+      }
     },
   },
 });

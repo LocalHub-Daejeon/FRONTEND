@@ -86,7 +86,14 @@ onMounted(() => store.fetchPosts({ page: 1, keyword: "" }));
       
       <template v-else>
         <div class="community-list modern-list">
-          <PostCard v-for="post in store.items" :key="post.id" :post="post" @like="likePost" />
+          <PostCard
+            v-for="post in store.items"
+            :key="post.id"
+            :post="post"
+            :liked="store.isPostLiked(post.id)"
+            :liking="store.isPostLiking(post.id)"
+            @like="likePost"
+          />
         </div>
         
         <div class="pagination-wrapper">

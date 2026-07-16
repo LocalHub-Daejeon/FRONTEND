@@ -16,6 +16,8 @@ const password = ref("");
 const busy = ref(false);
 const actionError = ref("");
 const post = computed(() => store.selected);
+const isLiked = computed(() => store.isPostLiked(route.params.postId));
+const isLiking = computed(() => store.isPostLiking(route.params.postId));
 
 async function likePost() {
   try {
@@ -86,9 +88,17 @@ onMounted(() => store.fetchPost(route.params.postId).catch(() => {}));
       
       <footer class="article-footer">
         <div class="footer-primary-action">
-          <button class="like-button large float-btn" type="button" @click="likePost">
-            <Heart :size="20" stroke-width="2.5" class="heart-pulse" /> 
-            <span>도움이 되었나요? <strong>{{ post.like_count }}</strong></span>
+          <button
+            class="like-button large float-btn"
+            :class="{ 'is-liked': isLiked }"
+            type="button"
+            :aria-pressed="isLiked"
+            :disabled="isLiking"
+            :title="isLiked ? '이미 좋아요를 누르셨어요' : '좋아요'"
+            @click="likePost"
+          >
+            <Heart :size="20" stroke-width="2.5" class="heart-pulse" :fill="isLiked ? 'currentColor' : 'none'" />
+            <span>{{ isLiked ? "이미 도움이 됐어요" : "도움이 되었나요?" }} <strong>{{ post.like_count }}</strong></span>
           </button>
         </div>
         
@@ -275,6 +285,18 @@ onMounted(() => store.fetchPost(route.params.postId).catch(() => {}));
 
 .float-btn:hover .heart-pulse {
   animation: pulse 1s infinite alternate;
+}
+
+.float-btn.is-liked {
+  background: #fff0ed;
+  border-color: var(--coral-dark);
+  color: var(--coral-dark);
+}
+
+.float-btn:disabled {
+  cursor: wait;
+  opacity: 0.65;
+  transform: none;
 }
 
 @keyframes pulse {

@@ -30,7 +30,7 @@ async function likePost(postId) {
   try {
     const result = await postsStore.likePost(postId);
     const post = posts.value.find((item) => item.id === Number(postId));
-    if (post) post.like_count = result.like_count;
+    if (post && !result.duplicate && !result.pending) post.like_count = result.like_count;
   } catch (err) {
     error.value = err.message;
   }
@@ -122,7 +122,14 @@ onMounted(async () => {
             <RouterLink class="text-link" to="/community">커뮤니티 보기 <ArrowRight :size="17" /></RouterLink>
           </div>
           <div v-if="posts.length" class="home-post-list">
-            <PostCard v-for="post in posts" :key="post.id" :post="post" @like="likePost" />
+            <PostCard
+              v-for="post in posts"
+              :key="post.id"
+              :post="post"
+              :liked="postsStore.isPostLiked(post.id)"
+              :liking="postsStore.isPostLiking(post.id)"
+              @like="likePost"
+            />
           </div>
           <StatePanel v-else title="아직 여행 이야기가 없어요" description="첫 번째 여행 기록을 남겨보세요." />
         </section>
