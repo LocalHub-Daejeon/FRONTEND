@@ -224,13 +224,12 @@ export default {
     communityPromptDescription: "나만의 팁과 여행 경험을 커뮤니티에 남겨주세요.",
     noLocation: "등록된 위치 정보가 없어요",
     directions: "네이버 지도에서 보기",
-    festivalSchedule: "축제 일정",
     festivalStartDate: "시작일",
     festivalEndDate: "종료일",
   },
   festivalPage: {
     title: "축제 캘린더",
-    description: "대전·충청의 축제 일정을 월별·권역별로 확인해보세요.",
+    description: "대전·충청의 축제 일정을 월별로 확인해보세요.",
     unit: "축제",
     emptyDescription: "새로운 축제 일정이 등록되면 이곳에서 확인할 수 있어요.",
   },
@@ -274,9 +273,6 @@ export default {
     aiStart: "대화 시작하기",
   },
   festivalCalendar: {
-    eyebrow: "FESTIVAL CALENDAR",
-    heading: "권역별 축제 일정",
-    description: "날짜가 등록된 축제를 월간 캘린더에서 확인해보세요.",
     regionFilterAriaLabel: "축제 권역 필터",
     regions: {
       all: "전체",
@@ -285,6 +281,13 @@ export default {
       "33": "충북",
       "34": "충남",
       unclassified: "기타 지역",
+    },
+    regionShort: {
+      "3": "대전",
+      "8": "세종",
+      "33": "충북",
+      "34": "충남",
+      other: "기타",
     },
     scheduledCount: "일정 등록 {count}개",
     unscheduledCount: "일정 미등록 {count}개",

@@ -21,7 +21,6 @@ const regionOptions = computed(() =>
     label: t(`festivalCalendar.regions.${value || "all"}`),
   })),
 );
-
 const selectedRegion = ref("");
 const selectedFestival = ref(null);
 
@@ -64,6 +63,10 @@ function regionLabelFor(areaCode) {
     : t("festivalCalendar.regions.unclassified");
 }
 
+function regionShortLabelFor(areaCode) {
+  return t(`festivalCalendar.regionShort.${areaCode || "other"}`);
+}
+
 const normalizedFestivals = computed(() =>
   props.festivals.map((festival) => {
     const sourceProps = festival.extendedProps || {};
@@ -86,6 +89,7 @@ const normalizedFestivals = computed(() =>
       eventplace: festival.eventplace || sourceProps.eventplace || "",
       areaCode,
       regionName: regionLabelFor(areaCode),
+      regionShortName: regionShortLabelFor(areaCode),
       start,
       inclusiveEnd: inclusiveEnd || start,
       endExclusive,
@@ -107,10 +111,24 @@ const unscheduledFestivals = computed(() =>
   filteredFestivals.value.filter((festival) => !festival.hasSchedule),
 );
 
+const activeRegionCodes = computed(() =>
+  regionOptionValues.filter(
+    (value) => value && normalizedFestivals.value.some((festival) => festival.areaCode === value),
+  ),
+);
+
+const visibleRegionOptions = computed(() => {
+  if (activeRegionCodes.value.length < 2) return [];
+
+  return regionOptions.value.filter(
+    (option) => !option.value || activeRegionCodes.value.includes(option.value),
+  );
+});
+
 const calendarEvents = computed(() =>
   scheduledFestivals.value.map((festival) => ({
     id: String(festival.contentid),
-    title: festival.title,
+    title: `[${festival.regionShortName}] ${festival.title}`,
     start: festival.start,
     end: festival.endExclusive,
     allDay: true,
@@ -150,8 +168,8 @@ const calendarOptions = reactive({
   initialView: "dayGridMonth",
   initialDate: calendarEvents.value[0]?.start,
   headerToolbar: {
-    left: "prev,next today",
-    center: "title",
+    left: "today",
+    center: "prev title next",
     right: "",
   },
   displayEventTime: false,
@@ -165,6 +183,12 @@ watch(calendarEvents, (events) => {
   calendarOptions.events = events;
 });
 
+watch(activeRegionCodes, (regionCodes) => {
+  if (selectedRegion.value && !regionCodes.includes(selectedRegion.value)) {
+    selectedRegion.value = "";
+  }
+});
+
 watch(locale, () => {
   Object.assign(calendarOptions, localizedCalendarSettings());
 });
@@ -172,29 +196,34 @@ watch(locale, () => {
 
 <template>
   <section class="festival-calendar-shell">
-    <div class="festival-filter-bar">
-      <div>
-        <p class="section-kicker">{{ t("festivalCalendar.eyebrow") }}</p>
-        <h2>{{ t("festivalCalendar.heading") }}</h2>
-        <p>{{ t("festivalCalendar.description") }}</p>
-      </div>
-      <div class="festival-region-filter" :aria-label="t('festivalCalendar.regionFilterAriaLabel')">
+    <div
+      v-if="visibleRegionOptions.length"
+      class="festival-region-filter-toolbar"
+      :aria-label="t('festivalCalendar.regionFilterAriaLabel')"
+    >
+      <div class="festival-region-filter">
         <button
-          v-for="option in regionOptions"
+          v-for="option in visibleRegionOptions"
           :key="option.value"
           type="button"
-          :class="{ active: selectedRegion === option.value }"
-          :disabled="option.value && regionCount(option.value) === 0"
+          :class="[
+            'region-filter-option',
+            option.value ? `region-color-${option.value}` : 'region-color-all',
+            { active: selectedRegion === option.value },
+          ]"
           @click="selectedRegion = option.value"
         >
+          <span v-if="option.value" class="region-color-dot" aria-hidden="true"></span>
           {{ option.label }} <small>{{ regionCount(option.value) }}</small>
         </button>
       </div>
     </div>
 
     <div class="festival-calendar-summary">
-      <span><CalendarDays :size="16" /> {{ t("festivalCalendar.scheduledCount", { count: scheduledFestivals.length }) }}</span>
-      <span v-if="unscheduledFestivals.length">{{ t("festivalCalendar.unscheduledCount", { count: unscheduledFestivals.length }) }}</span>
+      <div class="festival-calendar-counts">
+        <span><CalendarDays :size="16" /> {{ t("festivalCalendar.scheduledCount", { count: scheduledFestivals.length }) }}</span>
+        <span v-if="unscheduledFestivals.length">{{ t("festivalCalendar.unscheduledCount", { count: unscheduledFestivals.length }) }}</span>
+      </div>
     </div>
 
     <div class="festival-calendar-wrap">

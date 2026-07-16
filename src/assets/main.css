@@ -1471,29 +1471,14 @@ h3 {
 
 .festival-calendar-shell {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 18px;
 }
 
-.festival-filter-bar {
+.festival-region-filter-toolbar {
   display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 24px;
-  padding: 20px 22px;
-  border: 1px solid #cbd9d4;
-  border-radius: 8px;
-  background: #f2f7f5;
-}
-
-.festival-filter-bar h2 {
-  margin: 3px 0 5px;
-  font-size: 23px;
-}
-
-.festival-filter-bar p:last-child {
-  margin: 0;
-  color: var(--muted);
-  font-size: 13px;
+  justify-content: flex-end;
+  min-width: 0;
 }
 
 .festival-region-filter {
@@ -1504,6 +1489,9 @@ h3 {
 }
 
 .festival-region-filter button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   min-height: 36px;
   padding: 0 12px;
   border: 1px solid #c3d2cc;
@@ -1530,6 +1518,26 @@ h3 {
   color: rgba(255, 255, 255, 0.78);
 }
 
+.festival-region-filter .region-color-3.active {
+  border-color: #087f78;
+  background: #087f78;
+}
+
+.festival-region-filter .region-color-8.active {
+  border-color: #7662a8;
+  background: #7662a8;
+}
+
+.festival-region-filter .region-color-33.active {
+  border-color: #4678a8;
+  background: #4678a8;
+}
+
+.festival-region-filter .region-color-34.active {
+  border-color: #bb693e;
+  background: #bb693e;
+}
+
 .festival-region-filter button:disabled {
   cursor: not-allowed;
   opacity: 0.38;
@@ -1538,10 +1546,19 @@ h3 {
 .festival-calendar-summary {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
+  min-width: 0;
   gap: 16px;
   color: var(--muted);
   font-size: 12px;
   font-weight: 750;
+}
+
+.festival-calendar-counts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
 }
 
 .festival-calendar-summary span {
@@ -1554,7 +1571,33 @@ h3 {
   color: var(--brand-dark);
 }
 
+.region-color-dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #6f7f79;
+}
+
+.region-color-3 .region-color-dot {
+  background: #087f78;
+}
+
+.region-color-8 .region-color-dot {
+  background: #7662a8;
+}
+
+.region-color-33 .region-color-dot {
+  background: #4678a8;
+}
+
+.region-color-34 .region-color-dot {
+  background: #bb693e;
+}
+
 .festival-calendar-wrap {
+  min-width: 0;
   padding: 22px;
   border: 1px solid var(--line);
   border-radius: 9px;
@@ -1571,10 +1614,17 @@ h3 {
   margin-bottom: 20px;
 }
 
+.festival-calendar-wrap .fc .fc-toolbar-chunk:nth-child(2) {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .festival-calendar-wrap .fc .fc-toolbar-title {
   color: var(--ink);
   font-size: 25px;
   font-weight: 900;
+  white-space: nowrap;
 }
 
 .festival-calendar-wrap .fc .fc-button {
@@ -1596,6 +1646,16 @@ h3 {
 .festival-calendar-wrap .fc .fc-button:disabled {
   border-color: #9eb9b3;
   background: #9eb9b3;
+}
+
+.festival-calendar-wrap .fc .fc-prev-button,
+.festival-calendar-wrap .fc .fc-next-button {
+  display: inline-grid;
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+  padding: 0;
+  place-items: center;
 }
 
 .festival-calendar-wrap .fc-theme-standard td,
@@ -1644,6 +1704,12 @@ h3 {
   color: #fff;
   font-size: 11px;
   font-weight: 800;
+}
+
+.festival-calendar-wrap .fc .fc-event-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .festival-calendar-wrap .fc .festival-event-region-3 {
@@ -2614,9 +2680,8 @@ h3 {
     grid-column: 1 / -1;
   }
 
-  .festival-filter-bar {
-    align-items: stretch;
-    flex-direction: column;
+  .festival-region-filter-toolbar {
+    justify-content: flex-start;
   }
 
   .festival-region-filter {
@@ -2676,7 +2741,6 @@ h3 {
     grid-column: auto;
   }
 
-  .festival-filter-bar,
   .festival-calendar-wrap,
   .unscheduled-festivals {
     padding: 15px;
@@ -2701,6 +2765,21 @@ h3 {
 
   .festival-calendar-wrap .fc .fc-toolbar-title {
     font-size: 21px;
+  }
+
+  .festival-calendar-wrap .fc .fc-scrollgrid,
+  .festival-calendar-wrap .fc .fc-scrollgrid-sync-table {
+    width: 100% !important;
+    min-width: 0;
+    table-layout: fixed;
+  }
+
+  .festival-calendar-wrap .fc .fc-daygrid-day,
+  .festival-calendar-wrap .fc .fc-daygrid-event-harness,
+  .festival-calendar-wrap .fc .fc-daygrid-event,
+  .festival-calendar-wrap .fc .fc-event-main {
+    min-width: 0;
+    max-width: 100%;
   }
 
   .festival-calendar-wrap .fc .fc-daygrid-day-frame {
