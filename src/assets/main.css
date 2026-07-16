@@ -937,8 +937,8 @@ h3 {
 .map-selection {
   position: absolute;
   z-index: 500;
+  top: 14px;
   right: 14px;
-  bottom: 14px;
   left: 14px;
   display: grid;
   grid-template-columns: 58px minmax(0, 1fr) 24px;
