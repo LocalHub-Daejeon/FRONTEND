@@ -1,11 +1,16 @@
 <script setup>
+import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 import StatePanel from "../components/common/StatePanel.vue";
 import TourCard from "../components/tours/TourCard.vue";
+import TourMap from "../components/tours/TourMap.vue";
 import { useBookmarksStore } from "../stores/bookmarks";
 
 const { t } = useI18n();
 const bookmarks = useBookmarksStore();
+const mappableBookmarks = computed(() =>
+  bookmarks.items.filter((item) => Number(item.mapx) && Number(item.mapy)),
+);
 </script>
 
 <template>
@@ -26,9 +31,19 @@ const bookmarks = useBookmarksStore();
       :title="t('tours.bookmarks.emptyTitle')"
       :description="t('tours.bookmarks.emptyDescription')"
     />
-    <section v-else class="tour-grid bookmark-grid">
-      <TourCard v-for="tour in bookmarks.items" :key="tour.contentid" :tour="tour" />
-    </section>
+    <div v-else class="explore-layout">
+      <aside class="map-column">
+        <TourMap
+          v-if="mappableBookmarks.length"
+          :tours="mappableBookmarks"
+          :draw-path="mappableBookmarks.length > 1"
+        />
+        <StatePanel v-else :title="t('tours.bookmarks.noLocation')" />
+      </aside>
+      <section class="tour-grid bookmark-grid">
+        <TourCard v-for="tour in bookmarks.items" :key="tour.contentid" :tour="tour" />
+      </section>
+    </div>
   </div>
 </template>
 

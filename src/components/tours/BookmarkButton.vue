@@ -13,7 +13,7 @@ const { t } = useI18n();
 const bookmarks = useBookmarksStore();
 const isSaved = computed(() => bookmarks.has(props.tour.contentid));
 const label = computed(() =>
-  isSaved.value ? t("bookmarks.remove") : t("bookmarks.add"),
+  isSaved.value ? t("tours.bookmarks.remove") : t("tours.bookmarks.add"),
 );
 
 function toggleBookmark() {

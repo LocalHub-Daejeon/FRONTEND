@@ -168,6 +168,7 @@ export default {
       remove: "저장한 장소에서 삭제",
       emptyTitle: "저장한 장소가 없어요",
       emptyDescription: "관광지 카드나 상세 화면의 북마크 아이콘으로 장소를 저장해보세요.",
+      noLocation: "위치 정보가 있는 저장된 장소가 없어요",
     },
   },
   community: {
