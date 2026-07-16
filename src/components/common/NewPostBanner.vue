@@ -1,7 +1,9 @@
 <script setup>
 import { ref, watch } from "vue";
+import { useI18n } from "vue-i18n";
 import { useRealtimeStore } from "../../stores/realtime";
 
+const { t } = useI18n();
 const realtime = useRealtimeStore();
 const visible = ref(false);
 
@@ -25,6 +27,6 @@ watch(
     role="status"
     @animationend="visible = false"
   >
-    🎈 새로운 게시글이 등록되었습니다.
+    {{ t("common.newPostNotice") }}
   </div>
 </template>

@@ -1,12 +1,15 @@
 <script setup>
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { RouterLink, RouterView, useRoute } from "vue-router";
+import { useI18n } from "vue-i18n";
 import { Bot, CalendarDays, Compass, HeartHandshake, Map, Menu, X } from "@lucide/vue";
 import WeatherBadge from "./components/common/WeatherBadge.vue";
 import ViewerCountBadge from "./components/common/ViewerCountBadge.vue";
+import LanguageSwitcher from "./components/common/LanguageSwitcher.vue";
 import NewPostBanner from "./components/common/NewPostBanner.vue";
 import { useRealtimeStore } from "./stores/realtime";
 
+const { t } = useI18n();
 const route = useRoute();
 const menuOpen = ref(false);
 const realtime = useRealtimeStore();
@@ -15,13 +18,13 @@ onMounted(() => {
   realtime.init();
 });
 
-const navItems = [
-  { label: "둘러보기", to: "/", icon: Compass },
-  { label: "여행 지도", to: "/tours", icon: Map },
-  { label: "축제 캘린더", to: "/festivals", icon: CalendarDays },
-  { label: "커뮤니티", to: "/community", icon: HeartHandshake },
-  { label: "AI 여행메이트", to: "/chat", icon: Bot },
-];
+const navItems = computed(() => [
+  { label: t("common.nav.home"), to: "/", icon: Compass },
+  { label: t("common.nav.tours"), to: "/tours", icon: Map },
+  { label: t("common.nav.festivals"), to: "/festivals", icon: CalendarDays },
+  { label: t("common.nav.community"), to: "/community", icon: HeartHandshake },
+  { label: t("common.nav.chat"), to: "/chat", icon: Bot },
+]);
 
 function isActive(path) {
   if (path === "/") return route.path === "/";
@@ -33,12 +36,12 @@ function isActive(path) {
   <div class="app-frame">
     <header class="app-header">
       <div class="header-inner">
-        <RouterLink class="brand" to="/" aria-label="두루 홈">
-          <span class="brand-mark">두루</span>
-          <span class="brand-copy">대전·충청 여행 커뮤니티</span>
+        <RouterLink class="brand" to="/" :aria-label="t('common.brand.home')">
+          <span class="brand-mark">{{ t("common.brand.mark") }}</span>
+          <span class="brand-copy">{{ t("common.brand.tagline") }}</span>
         </RouterLink>
 
-        <nav class="desktop-nav" aria-label="주요 메뉴">
+        <nav class="desktop-nav" :aria-label="t('common.nav.mainMenu')">
           <RouterLink
             v-for="item in navItems"
             :key="item.to"
@@ -52,11 +55,14 @@ function isActive(path) {
 
         <div class="header-actions">
           <WeatherBadge />
-          <ViewerCountBadge />
+          <div class="viewer-lang-stack">
+            <ViewerCountBadge />
+            <LanguageSwitcher />
+          </div>
           <button
             class="icon-button mobile-menu-button"
             type="button"
-            :title="menuOpen ? '메뉴 닫기' : '메뉴 열기'"
+            :title="menuOpen ? t('common.nav.closeMenu') : t('common.nav.openMenu')"
             @click="menuOpen = !menuOpen"
           >
             <X v-if="menuOpen" :size="21" />
@@ -64,7 +70,7 @@ function isActive(path) {
           </button>
         </div>
       </div>
-      <nav v-if="menuOpen" class="mobile-nav" aria-label="모바일 메뉴">
+      <nav v-if="menuOpen" class="mobile-nav" :aria-label="t('common.nav.mobileMenu')">
         <RouterLink
           v-for="item in navItems"
           :key="item.to"
@@ -75,6 +81,9 @@ function isActive(path) {
           <component :is="item.icon" :size="18" />
           {{ item.label }}
         </RouterLink>
+        <div class="mobile-lang-row">
+          <LanguageSwitcher />
+        </div>
       </nav>
     </header>
 
@@ -84,10 +93,10 @@ function isActive(path) {
 
     <footer class="app-footer">
       <div>
-        <strong>두루</strong>
-        <span>대전·충청의 장소와 경험을 잇습니다.</span>
+        <strong>{{ t("common.brand.mark") }}</strong>
+        <span>{{ t("common.footer.tagline") }}</span>
       </div>
-      <span>Tour Community Project</span>
+      <span>{{ t("common.footer.project") }}</span>
     </footer>
   </div>
 </template>

@@ -1,16 +1,16 @@
 export const courseAreaOptions = [
-  { value: "", label: "전체" },
-  { value: "3", label: "대전" },
-  { value: "34", label: "충남" },
-  { value: "33", label: "충북" },
+  { value: "" },
+  { value: "3" },
+  { value: "34" },
+  { value: "33" },
 ];
 
 export const courseThemeOptions = [
-  { value: "", label: "전체" },
-  { value: "C0112", label: "가족" },
-  { value: "C0114", label: "힐링" },
-  { value: "C0115", label: "도보" },
-  { value: "C0116", label: "캠핑" },
+  { value: "" },
+  { value: "C0112" },
+  { value: "C0114" },
+  { value: "C0115" },
+  { value: "C0116" },
 ];
 
 const courseMetaById = {
@@ -44,9 +44,6 @@ const courseMetaById = {
   "1945189": { areaCode: "33", themeCode: "C0112", sigunguCode: "5" },
 };
 
-const areaNames = Object.fromEntries(courseAreaOptions.map((option) => [option.value, option.label]));
-const themeNames = Object.fromEntries(courseThemeOptions.map((option) => [option.value, option.label]));
-
 export function enrichTravelCourse(course) {
   const meta = courseMetaById[String(course.contentid)] || {};
   const areaCode = String(course.areacode || meta.areaCode || "");
@@ -55,9 +52,7 @@ export function enrichTravelCourse(course) {
   return {
     ...course,
     areaCode,
-    areaName: areaNames[areaCode] || "지역 미분류",
     themeCode,
-    themeName: themeNames[themeCode] || "테마 미분류",
     sigunguCode: String(course.sigungucode || meta.sigunguCode || ""),
   };
 }

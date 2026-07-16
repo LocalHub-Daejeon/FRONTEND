@@ -1,7 +1,9 @@
 <script setup>
+import { useI18n } from "vue-i18n";
 import { Eye, Heart, MessageSquareText } from "@lucide/vue";
 import { formatDate, truncate } from "../../utils/format";
 
+const { t } = useI18n();
 defineProps({ post: { type: Object, required: true } });
 const emit = defineEmits(["like"]);
 </script>
@@ -29,7 +31,7 @@ const emit = defineEmits(["like"]);
       <button
         class="interactive-like-btn"
         type="button"
-        :aria-label="`${post.title} 좋아요`"
+        :aria-label="t('post.likeAriaLabel', { title: post.title })"
         @click.stop="emit('like', post.id)"
       >
         <Heart :size="16" stroke-width="2.5" class="heart-icon" /> 

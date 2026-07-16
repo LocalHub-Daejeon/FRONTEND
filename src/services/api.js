@@ -1,3 +1,5 @@
+import i18n from "../i18n";
+
 const DEPLOYED_API_BASE_URL = "https://backend-33kp.onrender.com/api";
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || (import.meta.env.DEV ? "/api" : DEPLOYED_API_BASE_URL);
@@ -24,12 +26,12 @@ async function request(path, options = {}) {
       },
     });
   } catch {
-    throw new Error("API 서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.");
+    throw new Error(i18n.global.t("common.errors.networkError"));
   }
 
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new Error(data.detail || data.message || "요청을 처리하지 못했습니다.");
+    throw new Error(data.detail || data.message || i18n.global.t("common.errors.requestFailed"));
   }
   return data;
 }

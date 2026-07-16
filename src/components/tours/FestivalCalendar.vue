@@ -1,5 +1,6 @@
 <script setup>
 import { computed, reactive, ref, watch } from "vue";
+import { useI18n } from "vue-i18n";
 import FullCalendar from "@fullcalendar/vue3";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import koLocale from "@fullcalendar/core/locales/ko";
@@ -7,19 +8,20 @@ import { CalendarDays, MapPin, Phone } from "@lucide/vue";
 import AppModal from "../common/AppModal.vue";
 import { fallbackImage, onImageError } from "../../utils/format";
 
+const { t, locale } = useI18n();
+
 const props = defineProps({
   festivals: { type: Array, default: () => [] },
 });
 
-const regionOptions = [
-  { value: "", label: "전체" },
-  { value: "3", label: "대전" },
-  { value: "8", label: "세종" },
-  { value: "33", label: "충북" },
-  { value: "34", label: "충남" },
-];
+const regionOptionValues = ["", "3", "8", "33", "34"];
+const regionOptions = computed(() =>
+  regionOptionValues.map((value) => ({
+    value,
+    label: t(`festivalCalendar.regions.${value || "all"}`),
+  })),
+);
 
-const regionNames = Object.fromEntries(regionOptions.map((option) => [option.value, option.label]));
 const selectedRegion = ref("");
 const selectedFestival = ref(null);
 
@@ -51,9 +53,15 @@ function inferAreaCode(address) {
 
 function formatDisplayDate(value) {
   const normalized = normalizeDate(value);
-  if (!normalized) return "일정 정보 없음";
+  if (!normalized) return t("festivalCalendar.dateUnknown");
   const [year, month, day] = normalized.split("-");
   return `${year}.${month}.${day}`;
+}
+
+function regionLabelFor(areaCode) {
+  return regionOptionValues.includes(areaCode)
+    ? t(`festivalCalendar.regions.${areaCode || "all"}`)
+    : t("festivalCalendar.regions.unclassified");
 }
 
 const normalizedFestivals = computed(() =>
@@ -77,7 +85,7 @@ const normalizedFestivals = computed(() =>
       tel: festival.tel || sourceProps.tel || "",
       eventplace: festival.eventplace || sourceProps.eventplace || "",
       areaCode,
-      regionName: regionNames[areaCode] || "기타 지역",
+      regionName: regionLabelFor(areaCode),
       start,
       inclusiveEnd: inclusiveEnd || start,
       endExclusive,
@@ -122,15 +130,23 @@ function openFestival(eventInfo) {
 }
 
 function festivalDateRange(festival) {
-  if (!festival?.start) return "일정 정보 없음";
+  if (!festival?.start) return t("festivalCalendar.dateUnknown");
   const start = formatDisplayDate(festival.start);
   const end = formatDisplayDate(festival.inclusiveEnd);
   return start === end ? start : `${start} ~ ${end}`;
 }
 
+function localizedCalendarSettings() {
+  return {
+    locale: locale.value === "ko" ? koLocale : undefined,
+    buttonText: { today: t("festivalCalendar.todayButton") },
+    moreLinkText: (count) => t("festivalCalendar.moreLinkText", { count }),
+  };
+}
+
 const calendarOptions = reactive({
   plugins: [dayGridPlugin],
-  locale: koLocale,
+  ...localizedCalendarSettings(),
   initialView: "dayGridMonth",
   initialDate: calendarEvents.value[0]?.start,
   headerToolbar: {
@@ -138,11 +154,9 @@ const calendarOptions = reactive({
     center: "title",
     right: "",
   },
-  buttonText: { today: "오늘" },
   displayEventTime: false,
   fixedWeekCount: false,
   dayMaxEvents: 3,
-  moreLinkText: (count) => `+${count}개`,
   events: calendarEvents.value,
   eventClick: openFestival,
 });
@@ -150,17 +164,21 @@ const calendarOptions = reactive({
 watch(calendarEvents, (events) => {
   calendarOptions.events = events;
 });
+
+watch(locale, () => {
+  Object.assign(calendarOptions, localizedCalendarSettings());
+});
 </script>
 
 <template>
   <section class="festival-calendar-shell">
     <div class="festival-filter-bar">
       <div>
-        <p class="section-kicker">FESTIVAL CALENDAR</p>
-        <h2>권역별 축제 일정</h2>
-        <p>날짜가 등록된 축제를 월간 캘린더에서 확인해보세요.</p>
+        <p class="section-kicker">{{ t("festivalCalendar.eyebrow") }}</p>
+        <h2>{{ t("festivalCalendar.heading") }}</h2>
+        <p>{{ t("festivalCalendar.description") }}</p>
       </div>
-      <div class="festival-region-filter" aria-label="축제 권역 필터">
+      <div class="festival-region-filter" :aria-label="t('festivalCalendar.regionFilterAriaLabel')">
         <button
           v-for="option in regionOptions"
           :key="option.value"
@@ -175,8 +193,8 @@ watch(calendarEvents, (events) => {
     </div>
 
     <div class="festival-calendar-summary">
-      <span><CalendarDays :size="16" /> 일정 등록 {{ scheduledFestivals.length }}개</span>
-      <span v-if="unscheduledFestivals.length">일정 미등록 {{ unscheduledFestivals.length }}개</span>
+      <span><CalendarDays :size="16" /> {{ t("festivalCalendar.scheduledCount", { count: scheduledFestivals.length }) }}</span>
+      <span v-if="unscheduledFestivals.length">{{ t("festivalCalendar.unscheduledCount", { count: unscheduledFestivals.length }) }}</span>
     </div>
 
     <div class="festival-calendar-wrap">
@@ -186,10 +204,10 @@ watch(calendarEvents, (events) => {
     <section v-if="unscheduledFestivals.length" class="unscheduled-festivals">
       <div class="unscheduled-heading">
         <div>
-          <p class="section-kicker">DATE PENDING</p>
-          <h3>일정 정보가 아직 없는 축제</h3>
+          <p class="section-kicker">{{ t("festivalCalendar.datePendingEyebrow") }}</p>
+          <h3>{{ t("festivalCalendar.unscheduledHeading") }}</h3>
         </div>
-        <span>{{ unscheduledFestivals.length }}개</span>
+        <span>{{ unscheduledFestivals.length }}{{ t("festivalCalendar.unscheduledUnit") }}</span>
       </div>
       <div class="unscheduled-festival-list">
         <RouterLink
@@ -198,7 +216,7 @@ watch(calendarEvents, (events) => {
           :to="`/tours/${festival.contentid}`"
         >
           <strong>{{ festival.title }}</strong>
-          <small><MapPin :size="13" /> {{ festival.regionName }} · {{ festival.addr1 || "주소 정보 없음" }}</small>
+          <small><MapPin :size="13" /> {{ festival.regionName }} · {{ festival.addr1 || t("tours.addressUnknown") }}</small>
         </RouterLink>
       </div>
     </section>
@@ -213,31 +231,31 @@ watch(calendarEvents, (events) => {
       <div class="festival-detail-modal">
         <img
           :src="selectedFestival.firstimage || fallbackImage"
-          :alt="`${selectedFestival.title} 축제 사진`"
+          :alt="t('festivalCalendar.photoAlt', { title: selectedFestival.title })"
           @error="onImageError"
         />
         <div class="festival-detail-info">
           <span class="festival-region-badge">{{ selectedFestival.regionName }}</span>
           <dl>
             <div>
-              <dt><CalendarDays :size="17" /> 기간</dt>
+              <dt><CalendarDays :size="17" /> {{ t("festivalCalendar.period") }}</dt>
               <dd>{{ festivalDateRange(selectedFestival) }}</dd>
             </div>
             <div>
-              <dt><MapPin :size="17" /> 장소</dt>
-              <dd>{{ selectedFestival.eventplace || selectedFestival.addr2 || "행사 장소 정보 없음" }}</dd>
+              <dt><MapPin :size="17" /> {{ t("festivalCalendar.place") }}</dt>
+              <dd>{{ selectedFestival.eventplace || selectedFestival.addr2 || t("festivalCalendar.placeUnknown") }}</dd>
             </div>
             <div>
-              <dt><MapPin :size="17" /> 주소</dt>
-              <dd>{{ selectedFestival.addr1 || "주소 정보 없음" }}</dd>
+              <dt><MapPin :size="17" /> {{ t("festivalCalendar.address") }}</dt>
+              <dd>{{ selectedFestival.addr1 || t("tours.addressUnknown") }}</dd>
             </div>
             <div>
-              <dt><Phone :size="17" /> 문의</dt>
-              <dd>{{ selectedFestival.tel || "전화번호 정보 없음" }}</dd>
+              <dt><Phone :size="17" /> {{ t("festivalCalendar.contact") }}</dt>
+              <dd>{{ selectedFestival.tel || t("festivalCalendar.phoneUnknown") }}</dd>
             </div>
           </dl>
           <RouterLink class="primary-button" :to="`/tours/${selectedFestival.contentid}`">
-            상세 정보 보기
+            {{ t("festivalCalendar.viewDetail") }}
           </RouterLink>
         </div>
       </div>

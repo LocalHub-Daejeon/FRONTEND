@@ -1,12 +1,14 @@
 <script setup>
 import { computed, onMounted } from "vue";
 import { useRoute } from "vue-router";
+import { useI18n } from "vue-i18n";
 import { ArrowLeft, ExternalLink, MapPin, Phone, Route, Sparkles } from "@lucide/vue";
 import StatePanel from "../components/common/StatePanel.vue";
 import TourMap from "../components/tours/TourMap.vue";
 import { useToursStore } from "../stores/tours";
 import { fallbackImage, onImageError } from "../utils/format";
 
+const { t } = useI18n();
 const route = useRoute();
 const store = useToursStore();
 const tour = computed(() => store.selected);
@@ -23,18 +25,18 @@ onMounted(() => store.fetchTour(route.params.contentId).catch(() => {}));
   <div class="page-width page-view detail-view">
     <RouterLink class="back-link modern-back fade-in-up" to="/tours">
       <div class="back-icon-wrap"><ArrowLeft :size="18" stroke-width="2.5" /></div>
-      <span>여행 지도로 돌아가기</span>
+      <span>{{ t("tourDetail.backToMap") }}</span>
     </RouterLink>
-    
-    <StatePanel v-if="store.detailLoading" type="loading" title="장소 정보를 불러오는 중이에요" />
-    <StatePanel v-else-if="store.error" type="error" title="장소 정보를 찾지 못했어요" :description="store.error" />
+
+    <StatePanel v-if="store.detailLoading" type="loading" :title="t('tourDetail.loading')" />
+    <StatePanel v-else-if="store.error" type="error" :title="t('tourDetail.error')" :description="store.error" />
 
     <template v-else-if="tour">
       <!-- 👇 tour-detail-hero 클래스를 제거하여 main.css의 강제 덮개를 완벽히 차단했습니다 -->
       <section class="modern-hero fade-in-up" style="animation-delay: 0.1s;">
-        <img class="hero-bg" :src="tour.firstimage || tour.firstimage2 || fallbackImage" :alt="`${tour.title} 전경`" @error="onImageError" />
+        <img class="hero-bg" :src="tour.firstimage || tour.firstimage2 || fallbackImage" :alt="t('tourDetail.heroAlt', { title: tour.title })" @error="onImageError" />
         <div class="hero-overlay">
-          <span class="category-chip glass-chip">{{ tour.contentType || "관광지" }}</span>
+          <span class="category-chip glass-chip">{{ tour.contentType || t("tours.card.defaultCategory") }}</span>
           <h1 class="hero-title">{{ tour.title }}</h1>
           <p class="hero-address"><MapPin :size="18" /> {{ [tour.addr1, tour.addr2].filter(Boolean).join(" ") }}</p>
         </div>
@@ -44,37 +46,37 @@ onMounted(() => store.fetchTour(route.params.contentId).catch(() => {}));
         <section class="place-info">
           <div class="section-heading">
             <div>
-              <p class="section-kicker brand-kicker">PLACE INFO</p>
-              <h2>방문 정보</h2>
+              <p class="section-kicker brand-kicker">{{ t("tourDetail.kicker") }}</p>
+              <h2>{{ t("tourDetail.heading") }}</h2>
             </div>
           </div>
-          
+
           <dl class="info-list modern-info-list">
             <div class="info-row">
               <dt>
-                <div class="icon-bubble"><MapPin :size="18" /></div> 주소
+                <div class="icon-bubble"><MapPin :size="18" /></div> {{ t("tourDetail.address") }}
               </dt>
-              <dd>{{ [tour.addr1, tour.addr2].filter(Boolean).join(" ") || "정보 없음" }}</dd>
+              <dd>{{ [tour.addr1, tour.addr2].filter(Boolean).join(" ") || t("tourDetail.noInfo") }}</dd>
             </div>
             <div class="info-row">
               <dt>
-                <div class="icon-bubble"><Phone :size="18" /></div> 문의
+                <div class="icon-bubble"><Phone :size="18" /></div> {{ t("tourDetail.contact") }}
               </dt>
-              <dd>{{ tour.tel || "정보 없음" }}</dd>
+              <dd>{{ tour.tel || t("tourDetail.noInfo") }}</dd>
             </div>
             <div class="info-row">
               <dt>
-                <div class="icon-bubble"><Route :size="18" /></div> 우편번호
+                <div class="icon-bubble"><Route :size="18" /></div> {{ t("tourDetail.zipcode") }}
               </dt>
-              <dd>{{ tour.zipcode || "정보 없음" }}</dd>
+              <dd>{{ tour.zipcode || t("tourDetail.noInfo") }}</dd>
             </div>
           </dl>
-          
+
           <RouterLink class="community-prompt modern-prompt" to="/community">
             <div class="prompt-icon-wrap"><Sparkles :size="24" class="sparkle-icon" /></div>
             <div class="prompt-text">
-              <strong>이곳에 다녀오셨나요?</strong>
-              <small>나만의 팁과 여행 경험을 커뮤니티에 남겨주세요.</small>
+              <strong>{{ t("tourDetail.communityPromptTitle") }}</strong>
+              <small>{{ t("tourDetail.communityPromptDescription") }}</small>
             </div>
             <ExternalLink :size="18" class="prompt-arrow" />
           </RouterLink>
@@ -83,10 +85,10 @@ onMounted(() => store.fetchTour(route.params.contentId).catch(() => {}));
         <aside class="detail-map-panel">
           <div class="map-container">
             <TourMap v-if="hasCoordinates" :tours="[tour]" :active-id="tour.contentid" single />
-            <StatePanel v-else title="등록된 위치 정보가 없어요" />
+            <StatePanel v-else :title="t('tourDetail.noLocation')" />
           </div>
           <a v-if="directionsUrl" class="route-button" :href="directionsUrl" target="_blank" rel="noreferrer">
-            <MapPin :size="18" /> Google 지도에서 길찾기 <ExternalLink :size="16" class="ext-icon" />
+            <MapPin :size="18" /> {{ t("tourDetail.directions") }} <ExternalLink :size="16" class="ext-icon" />
           </a>
         </aside>
       </div>

@@ -1,6 +1,7 @@
 <script setup>
 import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
+import { useI18n } from "vue-i18n";
 import { ArrowRight, Bot, MapPin, Search, Sparkles } from "@lucide/vue";
 import StatePanel from "../components/common/StatePanel.vue";
 import PostCard from "../components/posts/PostCard.vue";
@@ -10,6 +11,7 @@ import { postsApi, toursApi } from "../services/api";
 import { usePostsStore } from "../stores/posts";
 import { fallbackImage, onImageError } from "../utils/format";
 
+const { t } = useI18n();
 const router = useRouter();
 const postsStore = usePostsStore();
 const tours = ref([]);
@@ -56,23 +58,23 @@ onMounted(async () => {
 <template>
   <div class="home-view">
     <section class="home-hero">
-      <img class="hero-bg-img" :src="heroImage" alt="대전·충청 관광지" @error="onImageError" />
+      <img class="hero-bg-img" :src="heroImage" :alt="t('home.heroImageAlt')" @error="onImageError" />
       <div class="hero-shade"></div>
       <div class="hero-content page-width">
         <div class="hero-text-wrap">
-          <p class="eyebrow fade-in-up" style="animation-delay: 0.1s;">DAEJEON · CHUNGCHEONG</p>
-          <h1 class="fade-in-up" style="animation-delay: 0.2s;">두루</h1>
-          <p class="hero-copy fade-in-up" style="animation-delay: 0.3s;">가까운 여행지를 발견하고, 다녀온 사람의 이야기를 만나는 곳</p>
+          <p class="eyebrow fade-in-up" style="animation-delay: 0.1s;">{{ t("home.heroEyebrow") }}</p>
+          <h1 class="fade-in-up" style="animation-delay: 0.2s;">{{ t("home.heroTitle") }}</h1>
+          <p class="hero-copy fade-in-up" style="animation-delay: 0.3s;">{{ t("home.heroCopy") }}</p>
         </div>
-        
+
         <form class="hero-search fade-in-up" style="animation-delay: 0.4s;" role="search" @submit.prevent="searchTours">
           <MapPin :size="20" class="search-icon" />
-          <input v-model="keyword" type="search" placeholder="어디로 떠나볼까요?" aria-label="관광지 검색" />
-          <button type="submit" title="검색"><Search :size="20" /></button>
+          <input v-model="keyword" type="search" :placeholder="t('home.searchPlaceholder')" :aria-label="t('home.searchAriaLabel')" />
+          <button type="submit" :title="t('home.search')"><Search :size="20" /></button>
         </form>
-        
+
         <RouterLink v-if="leadTour" class="hero-place fade-in-up" style="animation-delay: 0.5s;" :to="`/tours/${leadTour.contentid}`">
-          <span>지금 눈에 띄는 곳</span>
+          <span>{{ t("home.trending") }}</span>
           <strong>{{ leadTour.title }}</strong>
           <ArrowRight :size="17" class="arrow-icon" />
         </RouterLink>
@@ -80,17 +82,17 @@ onMounted(async () => {
     </section>
 
     <div class="page-width home-content">
-      <StatePanel v-if="loading" type="loading" title="지역의 여행 이야기를 모으고 있어요" />
-      <StatePanel v-else-if="error && !tours.length" type="error" title="콘텐츠를 불러오지 못했어요" :description="error" />
+      <StatePanel v-if="loading" type="loading" :title="t('home.loading')" />
+      <StatePanel v-else-if="error && !tours.length" type="error" :title="t('home.error')" :description="error" />
 
       <template v-else>
         <section class="section-block mixed-section">
           <div class="section-heading">
             <div>
-              <p class="section-kicker">지도에서 발견하기</p>
-              <h2>이번 주, 어디를 걸어볼까요?</h2>
+              <p class="section-kicker">{{ t("home.mapKicker") }}</p>
+              <h2>{{ t("home.mapHeading") }}</h2>
             </div>
-            <RouterLink class="text-link" to="/tours">전체 여행지 <ArrowRight :size="17" /></RouterLink>
+            <RouterLink class="text-link" to="/tours">{{ t("home.viewAllTours") }} <ArrowRight :size="17" /></RouterLink>
           </div>
 
           <div class="home-map-layout">
@@ -101,7 +103,7 @@ onMounted(async () => {
                   <img :src="activeTour.firstimage || fallbackImage" alt="" @error="onImageError" />
                 </div>
                 <span class="selection-info">
-                  <small>{{ activeTour.contentType || "관광지" }}</small>
+                  <small>{{ activeTour.contentType || t("tours.card.defaultCategory") }}</small>
                   <strong>{{ activeTour.title }}</strong>
                 </span>
                 <ArrowRight :size="18" class="selection-arrow" />
@@ -116,26 +118,26 @@ onMounted(async () => {
         <section class="section-block story-section">
           <div class="section-heading">
             <div>
-              <p class="section-kicker">여행자들의 기록</p>
-              <h2>먼저 다녀온 사람의 이야기</h2>
+              <p class="section-kicker">{{ t("home.storyKicker") }}</p>
+              <h2>{{ t("home.storyHeading") }}</h2>
             </div>
-            <RouterLink class="text-link" to="/community">커뮤니티 보기 <ArrowRight :size="17" /></RouterLink>
+            <RouterLink class="text-link" to="/community">{{ t("home.viewCommunity") }} <ArrowRight :size="17" /></RouterLink>
           </div>
           <div v-if="posts.length" class="home-post-list">
             <PostCard v-for="post in posts" :key="post.id" :post="post" @like="likePost" />
           </div>
-          <StatePanel v-else title="아직 여행 이야기가 없어요" description="첫 번째 여행 기록을 남겨보세요." />
+          <StatePanel v-else :title="t('home.emptyPostsTitle')" :description="t('home.emptyPostsDescription')" />
         </section>
 
         <section class="ai-invite advanced-gradient">
           <div class="ai-invite-content">
             <span class="ai-icon floating"><Sparkles :size="24" /></span>
-            <p class="section-kicker" style="color: #ffe18e;">AI 여행메이트</p>
-            <h2>취향을 말하면, 갈 곳이 선명해져요.</h2>
-            <p>관광 데이터에 등록된 장소를 바탕으로 지금 필요한 여행 코스를 함께 찾아드립니다.</p>
+            <p class="section-kicker" style="color: #ffe18e;">{{ t("home.aiKicker") }}</p>
+            <h2>{{ t("home.aiHeading") }}</h2>
+            <p>{{ t("home.aiDescription") }}</p>
           </div>
           <RouterLink class="primary-button ai-btn" to="/chat">
-            <Bot :size="18" /> 대화 시작하기
+            <Bot :size="18" /> {{ t("home.aiStart") }}
           </RouterLink>
         </section>
       </template>

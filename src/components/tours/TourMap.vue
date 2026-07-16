@@ -1,7 +1,10 @@
 <script setup>
 import { nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { useI18n } from "vue-i18n";
 import L from "leaflet";
-import "leaflet-routing-machine"; 
+import "leaflet-routing-machine";
+
+const { t, locale } = useI18n();
 
 const props = defineProps({
   tours: { type: Array, default: () => [] },
@@ -44,7 +47,7 @@ function groupedPopup(tours) {
   const popup = document.createElement("div");
   popup.className = "course-marker-popup";
   const heading = document.createElement("strong");
-  heading.textContent = `이 위치의 여행코스 ${tours.length}개`;
+  heading.textContent = t("tours.mapPopup.courseCountHeading", { count: tours.length });
   popup.appendChild(heading);
 
   tours.forEach((tour) => {
@@ -64,7 +67,7 @@ function createHoverTooltip(tour) {
   const imgUrl = tour.firstimage || tour.firstimage2;
   return `
     <div class="map-hover-preview">
-      ${imgUrl ? `<img src="${imgUrl}" alt="${tour.title}" />` : `<div class="no-img"><span>사진 없음</span></div>`}
+      ${imgUrl ? `<img src="${imgUrl}" alt="${tour.title}" />` : `<div class="no-img"><span>${t("tours.mapPopup.noPhoto")}</span></div>`}
       <strong>${tour.title}</strong>
     </div>
   `;
@@ -104,8 +107,8 @@ function renderMarkers() {
       
       marker.bindTooltip(`
         <div class="map-hover-preview grouped">
-          <strong>${tours.length}개의 장소</strong>
-          <small>클릭해서 목록을 확인하세요</small>
+          <strong>${t("tours.mapPopup.groupedCount", { count: tours.length })}</strong>
+          <small>${t("tours.mapPopup.clickToView")}</small>
         </div>
       `, { direction: "top", offset: [0, -22], className: "custom-preview-tooltip", opacity: 1 });
       
@@ -173,7 +176,7 @@ onBeforeUnmount(() => map?.remove());
 </script>
 
 <template>
-  <div ref="mapElement" class="tour-map" aria-label="관광지 위치 지도"></div>
+  <div ref="mapElement" class="tour-map" :aria-label="t('tours.mapPopup.ariaLabel')"></div>
 </template>
 
 <style scoped>
