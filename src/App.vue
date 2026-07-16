@@ -7,6 +7,7 @@ import WeatherBadge from "./components/common/WeatherBadge.vue";
 import ViewerCountBadge from "./components/common/ViewerCountBadge.vue";
 import LanguageSwitcher from "./components/common/LanguageSwitcher.vue";
 import NewPostBanner from "./components/common/NewPostBanner.vue";
+import LikeToast from "./components/common/LikeToast.vue";
 import { useRealtimeStore } from "./stores/realtime";
 
 const { t } = useI18n();
@@ -88,6 +89,7 @@ function isActive(path) {
     </header>
 
     <NewPostBanner />
+    <LikeToast />
 
     <main><RouterView /></main>
 

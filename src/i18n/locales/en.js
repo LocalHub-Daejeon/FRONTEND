@@ -223,7 +223,7 @@ export default {
     communityPromptTitle: "Have you been here?",
     communityPromptDescription: "Share your own tips and travel experience with the community.",
     noLocation: "No location info registered",
-    directions: "Get directions on Google Maps",
+    directions: "View in Naver Map",
   },
   festivalPage: {
     title: "Festival Calendar",

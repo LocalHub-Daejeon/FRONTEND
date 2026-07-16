@@ -14,9 +14,9 @@ const route = useRoute();
 const store = useToursStore();
 const tour = computed(() => store.selected);
 const hasCoordinates = computed(() => Number(tour.value?.mapx) && Number(tour.value?.mapy));
-const directionsUrl = computed(() => {
-  if (!hasCoordinates.value) return "";
-  return `https://www.google.com/maps/dir/?api=1&destination=${tour.value.mapy},${tour.value.mapx}`;
+const naverMapUrl = computed(() => {
+  const query = tour.value?.title?.trim();
+  return query ? `https://map.naver.com/p/search/${encodeURIComponent(query)}` : "";
 });
 const shareDescription = computed(() =>
   [tour.value?.addr1, tour.value?.addr2].filter(Boolean).join(" "),
@@ -91,7 +91,7 @@ onMounted(() => store.fetchTour(route.params.contentId).catch(() => {}));
             <TourMap v-if="hasCoordinates" :tours="[tour]" :active-id="tour.contentid" single />
             <StatePanel v-else :title="t('tourDetail.noLocation')" />
           </div>
-          <a v-if="directionsUrl" class="route-button" :href="directionsUrl" target="_blank" rel="noreferrer">
+          <a v-if="naverMapUrl" class="route-button" :href="naverMapUrl" target="_blank" rel="noopener noreferrer">
             <MapPin :size="18" /> {{ t("tourDetail.directions") }} <ExternalLink :size="16" class="ext-icon" />
           </a>
           <ShareButtons

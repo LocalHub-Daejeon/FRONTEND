@@ -4,7 +4,11 @@ import { Eye, Heart, MessageSquareText } from "@lucide/vue";
 import { formatDate, truncate } from "../../utils/format";
 
 const { t } = useI18n();
-defineProps({ post: { type: Object, required: true } });
+defineProps({
+  post: { type: Object, required: true },
+  liked: { type: Boolean, default: false },
+  liking: { type: Boolean, default: false },
+});
 const emit = defineEmits(["like"]);
 </script>
 
@@ -30,11 +34,14 @@ const emit = defineEmits(["like"]);
     <div class="post-card-action">
       <button
         class="interactive-like-btn"
+        :class="{ 'is-liked': liked }"
         type="button"
         :aria-label="t('post.likeAriaLabel', { title: post.title })"
+        :aria-pressed="liked"
+        :disabled="liking"
         @click.stop="emit('like', post.id)"
       >
-        <Heart :size="16" stroke-width="2.5" class="heart-icon" /> 
+        <Heart :size="16" stroke-width="2.5" class="heart-icon" :fill="liked ? 'currentColor' : 'none'" />
         <span class="like-count">{{ post.like_count }}</span>
       </button>
     </div>
@@ -201,6 +208,18 @@ const emit = defineEmits(["like"]);
 
 .interactive-like-btn:active {
   transform: translateY(1px) scale(0.95);
+}
+
+.interactive-like-btn.is-liked {
+  border-color: #efb2a6;
+  background: #fff0ed;
+  color: var(--coral-dark);
+}
+
+.interactive-like-btn:disabled {
+  cursor: wait;
+  opacity: 0.62;
+  transform: none;
 }
 
 .heart-icon {
