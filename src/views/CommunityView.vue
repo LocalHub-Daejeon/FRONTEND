@@ -1,5 +1,6 @@
 <script setup>
 import { onMounted, ref } from "vue";
+import { useI18n } from "vue-i18n";
 import { PenLine, Search, Sparkles } from "@lucide/vue";
 import AppModal from "../components/common/AppModal.vue";
 import AppPagination from "../components/common/AppPagination.vue";
@@ -8,6 +9,7 @@ import PostCard from "../components/posts/PostCard.vue";
 import PostEditor from "../components/posts/PostEditor.vue";
 import { usePostsStore } from "../stores/posts";
 
+const { t } = useI18n();
 const store = usePostsStore();
 const keywordInput = ref("");
 const editorOpen = ref(false);
@@ -54,12 +56,12 @@ onMounted(() => store.fetchPosts({ page: 1, keyword: "" }));
       <div class="hero-bg-shapes"></div>
       <div class="hero-content">
         <div class="hero-text">
-          <p class="eyebrow hero-eyebrow"><Sparkles :size="14" /> TRAVEL STORIES</p>
-          <h1>여행자 커뮤니티</h1>
-          <p>직접 다녀온 사람들의 생생한 경험과 작은 팁이 모여 다음 여행을 만듭니다.</p>
+          <p class="eyebrow hero-eyebrow"><Sparkles :size="14" /> {{ t("community.eyebrow") }}</p>
+          <h1>{{ t("community.title") }}</h1>
+          <p>{{ t("community.description") }}</p>
         </div>
         <button class="primary-button write-btn" type="button" @click="editorOpen = true">
-          <PenLine :size="18" class="write-icon" /> <span class="btn-text">새 이야기 쓰기</span>
+          <PenLine :size="18" class="write-icon" /> <span class="btn-text">{{ t("community.write") }}</span>
         </button>
       </div>
     </header>
@@ -68,21 +70,21 @@ onMounted(() => store.fetchPosts({ page: 1, keyword: "" }));
       <form class="glass-search-toolbar" role="search" @submit.prevent="search">
         <div class="search-input-wrap interactive-input">
           <Search :size="19" class="search-icon" />
-          <input v-model="keywordInput" type="search" placeholder="궁금한 여행지나 팁을 검색해보세요" aria-label="게시글 검색" />
+          <input v-model="keywordInput" type="search" :placeholder="t('community.searchPlaceholder')" :aria-label="t('community.searchAriaLabel')" />
         </div>
-        <button class="search-btn" type="submit">검색</button>
+        <button class="search-btn" type="submit">{{ t("community.search") }}</button>
       </form>
       <div class="meta-badge">
-        총 <strong>{{ store.total.toLocaleString() }}</strong>개의 이야기
+        {{ t("community.totalPrefix") }} <strong>{{ store.total.toLocaleString() }}</strong>{{ t("community.totalSuffix") }}
       </div>
     </div>
 
     <div v-if="actionError" class="alert-banner fade-in-up">{{ actionError }}</div>
 
     <div class="community-content-wrapper fade-in-up" style="animation-delay: 0.2s;">
-      <StatePanel v-if="store.loading" type="loading" title="여행 이야기를 불러오는 중이에요" />
-      <StatePanel v-else-if="store.error" type="error" title="게시글을 불러오지 못했어요" :description="store.error" />
-      <StatePanel v-else-if="!store.items.length" title="아직 등록된 이야기가 없어요" description="여행의 첫 기록을 남겨보세요." />
+      <StatePanel v-if="store.loading" type="loading" :title="t('community.loading')" />
+      <StatePanel v-else-if="store.error" type="error" :title="t('community.error')" :description="store.error" />
+      <StatePanel v-else-if="!store.items.length" :title="t('community.emptyTitle')" :description="t('community.emptyDescription')" />
       
       <template v-else>
         <div class="community-list modern-list">
@@ -104,8 +106,8 @@ onMounted(() => store.fetchPosts({ page: 1, keyword: "" }));
 
     <AppModal
       v-if="editorOpen"
-      title="새 여행 이야기"
-      description="직접 경험한 정보일수록 다른 여행자에게 큰 도움이 됩니다."
+      :title="t('community.newPostTitle')"
+      :description="t('community.newPostDescription')"
       wide
       @close="editorOpen = false"
     >

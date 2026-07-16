@@ -1,7 +1,9 @@
 <script setup>
 import { onBeforeUnmount, onMounted } from "vue";
+import { useI18n } from "vue-i18n";
 import { X } from "@lucide/vue";
 
+const { t } = useI18n();
 defineProps({
   title: { type: String, required: true },
   description: { type: String, default: "" },
@@ -34,7 +36,7 @@ onBeforeUnmount(() => {
             <h2>{{ title }}</h2>
             <p v-if="description">{{ description }}</p>
           </div>
-          <button class="icon-button close-btn" type="button" title="닫기" @click="$emit('close')">
+          <button class="icon-button close-btn" type="button" :title="t('common.close')" @click="$emit('close')">
             <X :size="20" stroke-width="2.5" />
           </button>
         </header>

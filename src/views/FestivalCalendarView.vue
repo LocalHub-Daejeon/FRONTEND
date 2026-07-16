@@ -1,9 +1,11 @@
 <script setup>
 import { onMounted, ref } from "vue";
+import { useI18n } from "vue-i18n";
 import StatePanel from "../components/common/StatePanel.vue";
 import FestivalCalendar from "../components/tours/FestivalCalendar.vue";
 import { toursApi } from "../services/api";
 
+const { t } = useI18n();
 const festivals = ref([]);
 const loading = ref(true);
 const error = ref("");
@@ -29,27 +31,27 @@ onMounted(fetchFestivals);
   <div class="page-width page-view festival-page">
     <header class="page-heading compact-heading">
       <div>
-        <p class="eyebrow dark">FESTIVAL CALENDAR</p>
-        <h1>축제 캘린더</h1>
-        <p>대전·충청의 축제 일정을 월별·권역별로 확인해보세요.</p>
+        <p class="eyebrow dark">{{ t("tours.festival.eyebrow") }}</p>
+        <h1>{{ t("festivalPage.title") }}</h1>
+        <p>{{ t("festivalPage.description") }}</p>
       </div>
       <strong v-if="!loading && !error" class="result-count">
-        {{ festivals.length.toLocaleString() }}<small>축제</small>
+        {{ festivals.length.toLocaleString() }}<small>{{ t("festivalPage.unit") }}</small>
       </strong>
     </header>
 
     <section aria-live="polite">
-      <StatePanel v-if="loading" type="loading" title="축제 일정을 불러오는 중이에요" />
+      <StatePanel v-if="loading" type="loading" :title="t('tours.loading.festival')" />
       <StatePanel
         v-else-if="error"
         type="error"
-        title="축제 일정을 불러오지 못했어요"
+        :title="t('tours.error.festival')"
         :description="error"
       />
       <StatePanel
         v-else-if="!festivals.length"
-        title="등록된 축제가 없어요"
-        description="새로운 축제 일정이 등록되면 이곳에서 확인할 수 있어요."
+        :title="t('tours.empty.festivalTitle')"
+        :description="t('festivalPage.emptyDescription')"
       />
       <FestivalCalendar v-else :festivals="festivals" />
     </section>

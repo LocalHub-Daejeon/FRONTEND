@@ -1,14 +1,17 @@
 import { defineStore } from "pinia";
 import { chatApi } from "../services/api";
+import i18n from "../i18n";
 
-const welcomeMessage = {
-  role: "assistant",
-  content: "어떤 하루를 보내고 싶나요? 지역, 동행, 분위기를 알려주시면 관광 정보 안에서 골라드릴게요.",
-};
+function createWelcomeMessage() {
+  return {
+    role: "assistant",
+    content: i18n.global.t("chat.welcome"),
+  };
+}
 
 export const useChatStore = defineStore("chat", {
   state: () => ({
-    messages: [welcomeMessage],
+    messages: [createWelcomeMessage()],
     history: [],
     references: [],
     sending: false,
@@ -31,7 +34,7 @@ export const useChatStore = defineStore("chat", {
         this.error = error.message;
         this.messages.push({
           role: "assistant",
-          content: `지금은 답변을 가져오지 못했어요. ${error.message}`,
+          content: i18n.global.t("chat.errorPrefix", { message: error.message }),
           isError: true,
         });
       } finally {
@@ -39,7 +42,7 @@ export const useChatStore = defineStore("chat", {
       }
     },
     reset() {
-      this.messages = [{ ...welcomeMessage }];
+      this.messages = [createWelcomeMessage()];
       this.history = [];
       this.references = [];
       this.error = "";

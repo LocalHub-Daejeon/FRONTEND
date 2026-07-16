@@ -1,7 +1,9 @@
 <script setup>
+import { useI18n } from "vue-i18n";
 import { Eye, Heart, MessageSquareText } from "@lucide/vue";
 import { formatDate, truncate } from "../../utils/format";
 
+const { t } = useI18n();
 defineProps({
   post: { type: Object, required: true },
   liked: { type: Boolean, default: false },
@@ -34,9 +36,8 @@ const emit = defineEmits(["like"]);
         class="interactive-like-btn"
         :class="{ 'is-liked': liked }"
         type="button"
-        :aria-label="liked ? `${post.title} 좋아요 누름` : `${post.title} 좋아요`"
+        :aria-label="t('post.likeAriaLabel', { title: post.title })"
         :aria-pressed="liked"
-        :title="liked ? '이미 좋아요를 누르셨어요' : '좋아요'"
         :disabled="liking"
         @click.stop="emit('like', post.id)"
       >

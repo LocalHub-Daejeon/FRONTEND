@@ -1,7 +1,10 @@
 <script setup>
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 import { ArrowUpRight, MapPin } from "@lucide/vue";
 import { fallbackImage, onImageError } from "../../utils/format";
+
+const { t } = useI18n();
 
 const props = defineProps({
   tour: { type: Object, required: true },
@@ -10,8 +13,8 @@ const props = defineProps({
 });
 
 const locationText = computed(() => {
-  if (!props.regionLabel) return props.tour.addr1 || "주소 정보 없음";
-  return [props.regionLabel, props.tour.addr1].filter(Boolean).join(" · ") || "대표 위치 정보 없음";
+  if (!props.regionLabel) return props.tour.addr1 || t("tours.addressUnknown");
+  return [props.regionLabel, props.tour.addr1].filter(Boolean).join(" · ") || t("tours.addressUnknown");
 });
 </script>
 
@@ -20,12 +23,12 @@ const locationText = computed(() => {
     <div class="tour-card-media">
       <img
         :src="tour.firstimage || fallbackImage"
-        :alt="`${tour.title} 관광지 사진`"
+        :alt="t('tours.card.photoAlt', { title: tour.title })"
         loading="lazy"
         @error="onImageError"
       />
       <div class="media-overlay"></div>
-      <span class="category-chip glass-chip">{{ themeLabel ? `${themeLabel} 코스` : tour.contentType || "관광지" }}</span>
+      <span class="category-chip glass-chip">{{ themeLabel ? `${themeLabel} ${t("tours.courseSuffix")}` : tour.contentType || t("tours.card.defaultCategory") }}</span>
     </div>
     <div class="tour-card-body">
       <div class="text-content">

@@ -1,6 +1,7 @@
 <script setup>
 import { computed, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { useI18n } from "vue-i18n";
 import { ArrowLeft, Eye, Heart, LockKeyhole, PenLine, Trash2, Calendar } from "@lucide/vue";
 import AppModal from "../components/common/AppModal.vue";
 import StatePanel from "../components/common/StatePanel.vue";
@@ -8,6 +9,7 @@ import PostEditor from "../components/posts/PostEditor.vue";
 import { usePostsStore } from "../stores/posts";
 import { formatDate } from "../utils/format";
 
+const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const store = usePostsStore();
@@ -67,72 +69,72 @@ onMounted(() => store.fetchPost(route.params.postId).catch(() => {}));
   <div class="page-width page-view post-detail-view fade-in">
     <RouterLink class="back-link modern-back" to="/community">
       <div class="back-icon-wrap"><ArrowLeft :size="18" /></div>
-      <span>커뮤니티 목록</span>
+      <span>{{ t("postDetail.backToList") }}</span>
     </RouterLink>
-    
-    <StatePanel v-if="store.detailLoading" type="loading" title="이야기를 불러오는 중이에요" />
-    <StatePanel v-else-if="store.error" type="error" title="게시글을 찾지 못했어요" :description="store.error" />
+
+    <StatePanel v-if="store.detailLoading" type="loading" :title="t('postDetail.loading')" />
+    <StatePanel v-else-if="store.error" type="error" :title="t('postDetail.error')" :description="store.error" />
 
     <article v-else-if="post" class="post-detail modern-article">
       <header class="article-header">
-        <p class="section-kicker brand-kicker">TRAVEL STORY</p>
+        <p class="section-kicker brand-kicker">{{ t("postDetail.kicker") }}</p>
         <h1 class="article-title">{{ post.title }}</h1>
         <div class="post-detail-meta advanced-meta">
           <span class="meta-tag"><Calendar :size="15" class="meta-icon" /> {{ formatDate(post.created_at, true) }}</span>
-          <span class="meta-tag"><Eye :size="15" class="meta-icon" /> 조회 {{ post.view_count }}</span>
-          <span class="meta-tag highlight"><Heart :size="15" class="meta-icon" /> 좋아요 {{ post.like_count }}</span>
+          <span class="meta-tag"><Eye :size="15" class="meta-icon" /> {{ t("postDetail.views") }} {{ post.view_count }}</span>
+          <span class="meta-tag highlight"><Heart :size="15" class="meta-icon" /> {{ t("postDetail.likes") }} {{ post.like_count }}</span>
         </div>
       </header>
-      
+
       <div class="post-content article-body">{{ post.content }}</div>
-      
+
       <footer class="article-footer">
         <div class="footer-primary-action">
           <button
             class="like-button large float-btn"
             :class="{ 'is-liked': isLiked }"
             type="button"
+            :aria-label="t('post.likeAriaLabel', { title: post.title })"
             :aria-pressed="isLiked"
             :disabled="isLiking"
-            :title="isLiked ? '이미 좋아요를 누르셨어요' : '좋아요'"
             @click="likePost"
           >
             <Heart :size="20" stroke-width="2.5" class="heart-pulse" :fill="isLiked ? 'currentColor' : 'none'" />
-            <span>{{ isLiked ? "이미 도움이 됐어요" : "도움이 되었나요?" }} <strong>{{ post.like_count }}</strong></span>
+            <span>{{ t("postDetail.likeCta") }} <strong>{{ post.like_count }}</strong></span>
           </button>
         </div>
-        
+
         <div class="footer-secondary-actions">
           <button class="action-btn edit" type="button" @click="mode = 'edit'">
-            <PenLine :size="15" /> 수정
+            <PenLine :size="15" /> {{ t("postDetail.edit") }}
           </button>
           <button class="action-btn delete" type="button" @click="mode = 'delete'">
-            <Trash2 :size="15" /> 삭제
+            <Trash2 :size="15" /> {{ t("postDetail.delete") }}
           </button>
         </div>
       </footer>
       <p v-if="actionError" class="inline-alert bottom-alert">{{ actionError }}</p>
     </article>
 
-    <AppModal v-if="mode === 'edit'" title="여행 이야기 수정" wide @close="closeModal">
+    <AppModal v-if="mode === 'edit'" :title="t('postDetail.editModalTitle')" wide @close="closeModal">
       <p v-if="actionError" class="inline-alert">{{ actionError }}</p>
       <PostEditor :post="post" :busy="busy" @submit="updatePost" />
     </AppModal>
 
     <AppModal
       v-if="mode === 'delete'"
-      title="게시글 삭제"
-      description="삭제한 글은 영구적으로 지워지며 되돌릴 수 없습니다."
+      :title="t('postDetail.deleteModalTitle')"
+      :description="t('postDetail.deleteModalDescription')"
       @close="closeModal"
     >
       <form class="password-form modern-form" @submit.prevent="deletePost">
         <label class="form-group">
-          <span class="label-text"><LockKeyhole :size="16" class="lock-icon" /> 작성할 때 입력한 비밀번호</span>
-          <input class="modern-input" v-model="password" type="password" maxlength="100" autofocus placeholder="비밀번호 입력" />
+          <span class="label-text"><LockKeyhole :size="16" class="lock-icon" /> {{ t("postDetail.passwordLabel") }}</span>
+          <input class="modern-input" v-model="password" type="password" maxlength="100" autofocus :placeholder="t('postDetail.passwordPlaceholder')" />
         </label>
         <p v-if="actionError" class="form-error-banner">{{ actionError }}</p>
         <button class="danger-button delete-confirm-btn" type="submit" :disabled="!password || busy">
-          <Trash2 :size="18" stroke-width="2.5" /> {{ busy ? "삭제 처리 중..." : "영구 삭제하기" }}
+          <Trash2 :size="18" stroke-width="2.5" /> {{ busy ? t("postDetail.deleting") : t("postDetail.deleteConfirm") }}
         </button>
       </form>
     </AppModal>

@@ -1,17 +1,19 @@
 <script setup>
-import { nextTick, ref } from "vue";
+import { computed, nextTick, ref } from "vue";
+import { useI18n } from "vue-i18n";
 import { Bot, MapPin, RotateCcw, Send, Sparkles } from "@lucide/vue";
 import { useChatStore } from "../stores/chat";
 import { fallbackImage, onImageError } from "../utils/format";
 
+const { t } = useI18n();
 const store = useChatStore();
 const input = ref("");
 const messageList = ref(null);
-const quickPrompts = [
-  "대전에서 조용히 산책하기 좋은 곳",
-  "아이와 함께 갈 만한 충청권 여행지",
-  "비 오는 날 즐기기 좋은 실내 장소",
-];
+const quickPrompts = computed(() => [
+  t("chat.quickPrompt1"),
+  t("chat.quickPrompt2"),
+  t("chat.quickPrompt3"),
+]);
 
 async function sendMessage(message = input.value) {
   const content = message.trim();
@@ -30,12 +32,12 @@ async function sendMessage(message = input.value) {
       <div class="hero-bg-shapes"></div>
       <div class="hero-content">
         <div class="hero-text">
-          <p class="eyebrow hero-eyebrow"><Bot :size="14" /> AI TRAVEL MATE</p>
-          <h1>여행메이트에게 물어보세요</h1>
-          <p>대전·충청 관광 정보를 바탕으로 취향에 맞는 장소를 함께 찾습니다.</p>
+          <p class="eyebrow hero-eyebrow"><Bot :size="14" /> {{ t("chat.eyebrow") }}</p>
+          <h1>{{ t("chat.title") }}</h1>
+          <p>{{ t("chat.description") }}</p>
         </div>
-        <button class="reset-btn" type="button" title="대화 초기화" @click="store.reset()">
-          <RotateCcw :size="18" class="reset-icon" /> <span>대화 초기화</span>
+        <button class="reset-btn" type="button" :title="t('chat.reset')" @click="store.reset()">
+          <RotateCcw :size="18" class="reset-icon" /> <span>{{ t("chat.reset") }}</span>
         </button>
       </div>
     </header>
@@ -74,14 +76,14 @@ async function sendMessage(message = input.value) {
 
         <div class="composer-container">
           <form class="chat-composer modern-composer" @submit.prevent="sendMessage()">
-            <input 
-              v-model="input" 
-              type="text" 
-              placeholder="원하는 여행을 편하게 말해주세요" 
-              :disabled="store.sending" 
+            <input
+              v-model="input"
+              type="text"
+              :placeholder="t('chat.inputPlaceholder')"
+              :disabled="store.sending"
               class="composer-input"
             />
-            <button class="send-button modern-send" type="submit" title="메시지 전송" :disabled="!input.trim() || store.sending">
+            <button class="send-button modern-send" type="submit" :title="t('chat.send')" :disabled="!input.trim() || store.sending">
               <Send :size="19" class="send-icon" />
             </button>
           </form>
@@ -91,13 +93,13 @@ async function sendMessage(message = input.value) {
       <aside class="reference-column modern-sidebar">
         <div class="reference-heading">
           <div class="heading-icon-wrap"><MapPin :size="18" stroke-width="2.5" /></div>
-          <h2>추천한 장소</h2>
+          <h2>{{ t("chat.referencesHeading") }}</h2>
         </div>
-        
+
         <div class="reference-content">
           <p v-if="!store.references.length" class="reference-empty">
             <Bot :size="32" class="empty-icon" />
-            대화를 시작하면 추천 장소와 기본 정보가 여기에 모입니다.
+            {{ t("chat.referencesEmpty") }}
           </p>
           
           <div class="reference-list">
@@ -112,7 +114,7 @@ async function sendMessage(message = input.value) {
               </div>
               <div class="ref-info">
                 <strong>{{ item.title }}</strong>
-                <small><MapPin :size="12" class="tiny-pin" /> {{ item.addr1 || "주소 정보 없음" }}</small>
+                <small><MapPin :size="12" class="tiny-pin" /> {{ item.addr1 || t("tours.addressUnknown") }}</small>
               </div>
             </RouterLink>
           </div>
