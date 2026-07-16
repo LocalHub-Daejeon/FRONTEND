@@ -5,6 +5,7 @@ import { useI18n } from "vue-i18n";
 import { ArrowLeft, CalendarDays, ExternalLink, MapPin, Phone, Route, Sparkles } from "@lucide/vue";
 import ShareButtons from "../components/common/ShareButtons.vue";
 import StatePanel from "../components/common/StatePanel.vue";
+import BookmarkButton from "../components/tours/BookmarkButton.vue";
 import TourMap from "../components/tours/TourMap.vue";
 import { useToursStore } from "../stores/tours";
 import { fallbackImage, formatEventDate, onImageError } from "../utils/format";
@@ -45,6 +46,7 @@ onMounted(() => store.fetchTour(route.params.contentId).catch(() => {}));
       <!-- 👇 tour-detail-hero 클래스를 제거하여 main.css의 강제 덮개를 완벽히 차단했습니다 -->
       <section class="modern-hero fade-in-up" style="animation-delay: 0.1s;">
         <img class="hero-bg" :src="tour.firstimage || tour.firstimage2 || fallbackImage" :alt="t('tourDetail.heroAlt', { title: tour.title })" @error="onImageError" />
+        <BookmarkButton class="hero-bookmark" :tour="tour" :size="20" />
         <div class="hero-overlay">
           <span class="category-chip glass-chip">{{ tour.contentType || t("tours.card.defaultCategory") }}</span>
           <h1 class="hero-title">{{ tour.title }}</h1>
@@ -183,6 +185,13 @@ onMounted(() => store.fetchTour(route.params.contentId).catch(() => {}));
   height: 100%;
   object-fit: cover;
   transition: transform 10s ease-out;
+}
+
+.hero-bookmark {
+  position: absolute;
+  top: 22px;
+  right: 22px;
+  z-index: 2;
 }
 
 .modern-hero:hover .hero-bg {
@@ -442,6 +451,11 @@ onMounted(() => store.fetchTour(route.params.contentId).catch(() => {}));
 
   .hero-title {
     font-size: 32px;
+  }
+
+  .hero-bookmark {
+    top: 18px;
+    right: 18px;
   }
 
   .detail-map-panel {

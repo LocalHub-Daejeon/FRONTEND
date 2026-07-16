@@ -32,6 +32,7 @@ export default {
       festivals: "축제 캘린더",
       community: "커뮤니티",
       chat: "AI 여행메이트",
+      bookmarks: "저장한 장소",
     },
     footer: {
       tagline: "대전·충청의 장소와 경험을 잇습니다.",
@@ -158,6 +159,15 @@ export default {
     card: {
       photoAlt: "{title} 관광지 사진",
       defaultCategory: "관광지",
+    },
+    bookmarks: {
+      title: "저장한 장소",
+      description: "다시 보고 싶은 관광지를 이 브라우저에 저장해두었어요.",
+      unit: "곳",
+      add: "장소 저장",
+      remove: "저장한 장소에서 삭제",
+      emptyTitle: "저장한 장소가 없어요",
+      emptyDescription: "관광지 카드나 상세 화면의 북마크 아이콘으로 장소를 저장해보세요.",
     },
   },
   community: {

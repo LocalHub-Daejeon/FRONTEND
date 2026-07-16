@@ -4,6 +4,11 @@ const routes = [
   { path: "/", name: "home", component: () => import("../views/HomeView.vue") },
   { path: "/tours", name: "tours", component: () => import("../views/ToursView.vue") },
   {
+    path: "/bookmarks",
+    name: "bookmarks",
+    component: () => import("../views/BookmarksView.vue"),
+  },
+  {
     path: "/festivals",
     name: "festivals",
     component: () => import("../views/FestivalCalendarView.vue"),

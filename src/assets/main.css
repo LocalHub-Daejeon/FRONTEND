@@ -175,12 +175,69 @@ h3 {
   background: var(--brand);
 }
 
+@media (max-width: 1500px) {
+  .header-inner {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+
+  .desktop-nav {
+    justify-content: center;
+    gap: 4px;
+  }
+
+  .desktop-nav a {
+    justify-content: center;
+    width: 42px;
+    padding: 0;
+  }
+
+  .desktop-nav .nav-label {
+    display: none;
+  }
+
+  .desktop-nav a::after {
+    right: 4px;
+    left: 4px;
+  }
+}
+
 .header-actions {
   display: flex;
   align-items: center;
   justify-self: end;
+  flex: 0 0 auto;
   min-width: 0;
   gap: 10px;
+}
+
+.header-bookmark-link {
+  position: relative;
+  flex: 0 0 auto;
+  text-decoration: none;
+}
+
+.header-bookmark-link.active {
+  border-color: var(--brand);
+  background: var(--surface-alt);
+  color: var(--brand-dark);
+}
+
+.bookmark-count-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  display: grid;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  place-items: center;
+  border: 2px solid var(--surface);
+  border-radius: 9px;
+  background: var(--coral);
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1;
 }
 
 .weather-badge {
@@ -848,6 +905,23 @@ h3 {
 
 .home-map-wrap .tour-map {
   height: 100%;
+}
+
+@media (min-width: 1081px) {
+  .featured-tour-grid {
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+    min-height: 570px;
+  }
+
+  .featured-tour-grid .tour-card {
+    height: 100%;
+    min-height: 0;
+  }
+
+  .featured-tour-grid .tour-card-link {
+    height: 100%;
+    grid-template-rows: 140px minmax(0, 1fr);
+  }
 }
 
 .map-selection {
@@ -2533,6 +2607,10 @@ h3 {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
+  .featured-tour-grid .tour-card-link {
+    grid-template-rows: 160px minmax(112px, auto);
+  }
+
   .featured-tour-grid .tour-card {
     grid-template-rows: 140px minmax(118px, auto);
   }
@@ -2846,6 +2924,11 @@ h3 {
   .featured-tour-grid,
   .tour-grid {
     grid-template-columns: 1fr;
+  }
+
+  .featured-tour-grid .tour-card-link,
+  .tour-results .tour-card-link {
+    grid-template-rows: 190px minmax(104px, auto);
   }
 
   .featured-tour-grid .tour-card,

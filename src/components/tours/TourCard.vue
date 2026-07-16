@@ -2,6 +2,7 @@
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 import { ArrowUpRight, MapPin } from "@lucide/vue";
+import BookmarkButton from "./BookmarkButton.vue";
 import { fallbackImage, onImageError } from "../../utils/format";
 
 const { t } = useI18n();
@@ -19,37 +20,39 @@ const locationText = computed(() => {
 </script>
 
 <template>
-  <RouterLink class="tour-card modern-tour-card" :to="`/tours/${tour.contentid}`">
-    <div class="tour-card-media">
-      <img
-        :src="tour.firstimage || fallbackImage"
-        :alt="t('tours.card.photoAlt', { title: tour.title })"
-        loading="lazy"
-        @error="onImageError"
-      />
-      <div class="media-overlay"></div>
-      <span class="category-chip glass-chip">{{ themeLabel ? `${themeLabel} ${t("tours.courseSuffix")}` : tour.contentType || t("tours.card.defaultCategory") }}</span>
-    </div>
-    <div class="tour-card-body">
-      <div class="text-content">
-        <h3 class="tour-title" :title="tour.title">{{ tour.title }}</h3>
-        <p class="tour-location">
-          <MapPin :size="15" class="pin-icon" />
-          <span class="location-text">{{ locationText }}</span>
-        </p>
+  <article class="tour-card modern-tour-card">
+    <RouterLink class="tour-card-link" :to="`/tours/${tour.contentid}`">
+      <div class="tour-card-media">
+        <img
+          :src="tour.firstimage || fallbackImage"
+          :alt="t('tours.card.photoAlt', { title: tour.title })"
+          loading="lazy"
+          @error="onImageError"
+        />
+        <div class="media-overlay"></div>
+        <span class="category-chip glass-chip">{{ themeLabel ? `${themeLabel} ${t("tours.courseSuffix")}` : tour.contentType || t("tours.card.defaultCategory") }}</span>
       </div>
-      <div class="action-icon-wrap">
-        <ArrowUpRight class="card-arrow" :size="20" aria-hidden="true" />
+      <div class="tour-card-body">
+        <div class="text-content">
+          <h3 class="tour-title" :title="tour.title">{{ tour.title }}</h3>
+          <p class="tour-location">
+            <MapPin :size="15" class="pin-icon" />
+            <span class="location-text">{{ locationText }}</span>
+          </p>
+        </div>
+        <div class="action-icon-wrap">
+          <ArrowUpRight class="card-arrow" :size="20" aria-hidden="true" />
+        </div>
       </div>
-    </div>
-  </RouterLink>
+    </RouterLink>
+    <BookmarkButton class="tour-card-bookmark" :tour="tour" />
+  </article>
 </template>
 
 <style scoped>
 /* 카드 전체 래퍼 디자인 */
 .modern-tour-card {
-  display: grid;
-  grid-template-rows: 200px auto;
+  display: block;
   min-width: 0;
   overflow: hidden;
   border: 1px solid var(--line);
@@ -58,6 +61,14 @@ const locationText = computed(() => {
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
   position: relative;
+  text-decoration: none;
+}
+
+.tour-card-link {
+  display: grid;
+  grid-template-rows: 200px auto;
+  min-width: 0;
+  color: inherit;
   text-decoration: none;
 }
 
@@ -83,6 +94,13 @@ const locationText = computed(() => {
 
 .modern-tour-card:hover .tour-card-media img {
   transform: scale(1.08);
+}
+
+.tour-card-bookmark {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
 }
 
 /* 이미지 위에 깔리는 은은한 그라데이션 오버레이 (텍스트 가독성 및 고급스러움) */
@@ -206,4 +224,5 @@ const locationText = computed(() => {
 .modern-tour-card:hover .card-arrow {
   color: #ffffff;
 }
+
 </style>

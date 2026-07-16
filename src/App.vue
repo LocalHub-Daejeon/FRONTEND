@@ -2,18 +2,20 @@
 import { computed, onMounted, ref } from "vue";
 import { RouterLink, RouterView, useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
-import { Bot, CalendarDays, Compass, HeartHandshake, Map, Menu, X } from "@lucide/vue";
+import { Bookmark, Bot, CalendarDays, Compass, HeartHandshake, Map, Menu, X } from "@lucide/vue";
 import WeatherBadge from "./components/common/WeatherBadge.vue";
 import ViewerCountBadge from "./components/common/ViewerCountBadge.vue";
 import LanguageSwitcher from "./components/common/LanguageSwitcher.vue";
 import NewPostBanner from "./components/common/NewPostBanner.vue";
 import LikeToast from "./components/common/LikeToast.vue";
 import { useRealtimeStore } from "./stores/realtime";
+import { useBookmarksStore } from "./stores/bookmarks";
 
 const { t } = useI18n();
 const route = useRoute();
 const menuOpen = ref(false);
 const realtime = useRealtimeStore();
+const bookmarks = useBookmarksStore();
 
 onMounted(() => {
   realtime.init();
@@ -25,6 +27,10 @@ const navItems = computed(() => [
   { label: t("common.nav.festivals"), to: "/festivals", icon: CalendarDays },
   { label: t("common.nav.community"), to: "/community", icon: HeartHandshake },
   { label: t("common.nav.chat"), to: "/chat", icon: Bot },
+]);
+const mobileNavItems = computed(() => [
+  ...navItems.value,
+  { label: t("common.nav.bookmarks"), to: "/bookmarks", icon: Bookmark },
 ]);
 
 function isActive(path) {
@@ -48,14 +54,26 @@ function isActive(path) {
             :key="item.to"
             :to="item.to"
             :class="{ active: isActive(item.to) }"
+            :aria-label="item.label"
+            :title="item.label"
           >
             <component :is="item.icon" :size="17" />
-            {{ item.label }}
+            <span class="nav-label">{{ item.label }}</span>
           </RouterLink>
         </nav>
 
         <div class="header-actions">
           <WeatherBadge />
+          <RouterLink
+            class="header-bookmark-link icon-button"
+            to="/bookmarks"
+            :class="{ active: isActive('/bookmarks') }"
+            :aria-label="t('common.nav.bookmarks')"
+            :title="t('common.nav.bookmarks')"
+          >
+            <Bookmark :size="19" :fill="bookmarks.count ? 'currentColor' : 'none'" />
+            <span v-if="bookmarks.count" class="bookmark-count-badge">{{ bookmarks.count > 99 ? '99+' : bookmarks.count }}</span>
+          </RouterLink>
           <div class="viewer-lang-stack">
             <ViewerCountBadge />
             <LanguageSwitcher />
@@ -73,14 +91,14 @@ function isActive(path) {
       </div>
       <nav v-if="menuOpen" class="mobile-nav" :aria-label="t('common.nav.mobileMenu')">
         <RouterLink
-          v-for="item in navItems"
+          v-for="item in mobileNavItems"
           :key="item.to"
           :to="item.to"
           :class="{ active: isActive(item.to) }"
           @click="menuOpen = false"
         >
           <component :is="item.icon" :size="18" />
-          {{ item.label }}
+          <span>{{ item.label }}</span>
         </RouterLink>
         <div class="mobile-lang-row">
           <LanguageSwitcher />
