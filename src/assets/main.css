@@ -176,10 +176,6 @@ h3 {
 }
 
 @media (max-width: 1500px) {
-  .header-inner {
-    grid-template-columns: auto minmax(0, 1fr) auto;
-  }
-
   .desktop-nav {
     justify-content: center;
     gap: 4px;
@@ -206,8 +202,9 @@ h3 {
   align-items: center;
   justify-self: end;
   flex: 0 0 auto;
+  width: 322px;
   min-width: 0;
-  gap: 10px;
+  gap: 6px;
 }
 
 .header-bookmark-link {
@@ -242,12 +239,14 @@ h3 {
 
 .weather-badge {
   display: grid;
-  grid-template-columns: 36px minmax(78px, auto);
-  min-width: 132px;
+  box-sizing: border-box;
+  grid-template-columns: 34px minmax(70px, 1fr);
+  flex: 0 0 120px;
+  min-width: 120px;
   height: 48px;
   align-items: center;
-  gap: 8px;
-  padding-left: 15px;
+  gap: 6px;
+  padding-left: 10px;
   border-left: 1px solid var(--line);
 }
 
@@ -345,12 +344,15 @@ h3 {
 
 .viewer-lang-stack {
   display: flex;
+  box-sizing: border-box;
+  flex: 0 0 148px;
+  width: 148px;
   flex-direction: column;
   align-items: flex-end;
   justify-content: center;
   gap: 5px;
   height: 48px;
-  padding-left: 15px;
+  padding-left: 10px;
   border-left: 1px solid var(--line);
 }
 
@@ -358,6 +360,8 @@ h3 {
   display: flex;
   align-items: center;
   gap: 7px;
+  max-width: 100%;
+  overflow: hidden;
   color: var(--ink-soft);
   font-size: 12px;
   font-weight: 700;
@@ -376,6 +380,12 @@ h3 {
 .viewer-copy strong {
   color: var(--brand-dark);
   font-size: 13px;
+}
+
+.viewer-copy {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 @keyframes viewer-pulse {
@@ -2555,7 +2565,7 @@ h3 {
 
 @media (max-width: 1080px) {
   .header-inner {
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   }
 
   .desktop-nav {
@@ -2577,9 +2587,14 @@ h3 {
 
   .weather-badge {
     grid-template-columns: 32px minmax(70px, auto);
+    flex-basis: 112px;
     min-width: 112px;
     gap: 6px;
     padding-left: 10px;
+  }
+
+  .header-actions {
+    width: 298px;
   }
 
   .weather-emoji {
@@ -2588,6 +2603,8 @@ h3 {
   }
 
   .viewer-lang-stack {
+    flex-basis: 132px;
+    width: 132px;
     padding-left: 10px;
   }
 
@@ -2668,6 +2685,10 @@ h3 {
 
   .viewer-lang-stack {
     display: none;
+  }
+
+  .header-actions {
+    width: auto;
   }
 
   .post-notice-banner {

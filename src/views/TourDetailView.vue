@@ -15,8 +15,28 @@ const route = useRoute();
 const store = useToursStore();
 const tour = computed(() => store.selected);
 const hasCoordinates = computed(() => Number(tour.value?.mapx) && Number(tour.value?.mapy));
+const addressQuery = computed(() =>
+  [tour.value?.addr1, tour.value?.addr2].filter(Boolean).join(" ").trim(),
+);
+const isFestival = computed(() =>
+  String(tour.value?.contenttypeid) === "15" || tour.value?.contentType?.includes("축제"),
+);
+const isCourse = computed(() =>
+  String(tour.value?.contenttypeid) === "25" || tour.value?.contentType?.includes("코스"),
+);
 const naverMapUrl = computed(() => {
-  const query = tour.value?.title?.trim();
+  if (!tour.value) return "";
+
+  if (isFestival.value && addressQuery.value) {
+    return `https://map.naver.com/p/search/${encodeURIComponent(addressQuery.value)}`;
+  }
+
+  if ((isCourse.value || !addressQuery.value) && hasCoordinates.value) {
+    const coordinates = `${tour.value.mapy},${tour.value.mapx}`;
+    return `https://map.naver.com/p/search/${encodeURIComponent(coordinates)}`;
+  }
+
+  const query = addressQuery.value || tour.value.title?.trim();
   return query ? `https://map.naver.com/p/search/${encodeURIComponent(query)}` : "";
 });
 const shareDescription = computed(() =>
