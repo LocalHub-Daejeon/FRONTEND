@@ -224,6 +224,9 @@ export default {
     communityPromptDescription: "Share your own tips and travel experience with the community.",
     noLocation: "No location info registered",
     directions: "View in Naver Map",
+    festivalSchedule: "Festival schedule",
+    festivalStartDate: "Starts",
+    festivalEndDate: "Ends",
   },
   festivalPage: {
     title: "Festival Calendar",

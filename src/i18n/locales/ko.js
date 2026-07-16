@@ -224,6 +224,9 @@ export default {
     communityPromptDescription: "나만의 팁과 여행 경험을 커뮤니티에 남겨주세요.",
     noLocation: "등록된 위치 정보가 없어요",
     directions: "네이버 지도에서 보기",
+    festivalSchedule: "축제 일정",
+    festivalStartDate: "시작일",
+    festivalEndDate: "종료일",
   },
   festivalPage: {
     title: "축제 캘린더",
