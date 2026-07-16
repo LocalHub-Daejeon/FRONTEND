@@ -32,6 +32,7 @@ export default {
       festivals: "Festival Calendar",
       community: "Community",
       chat: "AI Travel Mate",
+      bookmarks: "Saved places",
     },
     footer: {
       tagline: "Connecting places and experiences across Daejeon & Chungcheong.",
@@ -158,6 +159,15 @@ export default {
     card: {
       photoAlt: "Photo of {title}",
       defaultCategory: "Attraction",
+    },
+    bookmarks: {
+      title: "Saved places",
+      description: "Places you saved in this browser for another look.",
+      unit: "places",
+      add: "Save place",
+      remove: "Remove saved place",
+      emptyTitle: "No saved places yet",
+      emptyDescription: "Save a place from a tour card or its detail page using the bookmark icon.",
     },
   },
   community: {
