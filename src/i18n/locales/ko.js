@@ -39,6 +39,18 @@ export default {
     },
     close: "닫기",
     newPostNotice: "🎈 새로운 게시글이 등록되었습니다.",
+    share: {
+      label: "공유하기",
+      kakao: "카카오톡",
+      message: "메시지",
+      facebook: "페이스북",
+      twitter: "트위터(X)",
+      instagram: "인스타그램",
+      instagramNotice: "링크 복사됨 · 앱에 붙여넣기",
+      copyLink: "링크 복사",
+      copied: "복사됨",
+      viewMore: "자세히 보기",
+    },
     errors: {
       networkError: "API 서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.",
       requestFailed: "요청을 처리하지 못했습니다.",

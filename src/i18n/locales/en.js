@@ -39,6 +39,18 @@ export default {
     },
     close: "Close",
     newPostNotice: "🎈 A new post was just added.",
+    share: {
+      label: "Share",
+      kakao: "KakaoTalk",
+      message: "Message",
+      facebook: "Facebook",
+      twitter: "Twitter (X)",
+      instagram: "Instagram",
+      instagramNotice: "Link copied · paste in the app",
+      copyLink: "Copy link",
+      copied: "Copied",
+      viewMore: "View more",
+    },
     errors: {
       networkError: "Couldn't connect to the server. Please try again in a moment.",
       requestFailed: "The request could not be processed.",

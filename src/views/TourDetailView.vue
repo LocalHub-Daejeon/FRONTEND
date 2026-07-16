@@ -3,6 +3,7 @@ import { computed, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { ArrowLeft, ExternalLink, MapPin, Phone, Route, Sparkles } from "@lucide/vue";
+import ShareButtons from "../components/common/ShareButtons.vue";
 import StatePanel from "../components/common/StatePanel.vue";
 import TourMap from "../components/tours/TourMap.vue";
 import { useToursStore } from "../stores/tours";
@@ -17,16 +18,27 @@ const directionsUrl = computed(() => {
   if (!hasCoordinates.value) return "";
   return `https://www.google.com/maps/dir/?api=1&destination=${tour.value.mapy},${tour.value.mapx}`;
 });
+const shareDescription = computed(() =>
+  [tour.value?.addr1, tour.value?.addr2].filter(Boolean).join(" "),
+);
 
 onMounted(() => store.fetchTour(route.params.contentId).catch(() => {}));
 </script>
 
 <template>
   <div class="page-width page-view detail-view">
-    <RouterLink class="back-link modern-back fade-in-up" to="/tours">
-      <div class="back-icon-wrap"><ArrowLeft :size="18" stroke-width="2.5" /></div>
-      <span>{{ t("tourDetail.backToMap") }}</span>
-    </RouterLink>
+    <div class="detail-top-bar fade-in-up">
+      <RouterLink class="back-link modern-back" to="/tours">
+        <div class="back-icon-wrap"><ArrowLeft :size="18" stroke-width="2.5" /></div>
+        <span>{{ t("tourDetail.backToMap") }}</span>
+      </RouterLink>
+      <ShareButtons
+        v-if="tour"
+        :title="tour.title"
+        :description="shareDescription"
+        :image-url="tour.firstimage || tour.firstimage2 || fallbackImage"
+      />
+    </div>
 
     <StatePanel v-if="store.detailLoading" type="loading" :title="t('tourDetail.loading')" />
     <StatePanel v-else-if="store.error" type="error" :title="t('tourDetail.error')" :description="store.error" />
@@ -107,11 +119,20 @@ onMounted(() => store.fetchTour(route.params.contentId).catch(() => {}));
   animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+.detail-top-bar {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
 .modern-back {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 24px;
   color: var(--ink-soft);
   font-weight: 800;
   transition: color 0.2s ease;
@@ -397,6 +418,10 @@ onMounted(() => store.fetchTour(route.params.contentId).catch(() => {}));
   
   .detail-map-panel {
     position: static;
+  }
+
+  .detail-top-bar {
+    flex-wrap: wrap;
   }
 }
 </style>
