@@ -168,6 +168,7 @@ export default {
       remove: "Remove saved place",
       emptyTitle: "No saved places yet",
       emptyDescription: "Save a place from a tour card or its detail page using the bookmark icon.",
+      noLocation: "None of your saved places have location info",
     },
   },
   community: {
